@@ -1,85 +1,70 @@
 import type { Metadata } from "next";
-import { setRequestLocale } from "next-intl/server";
+import { useTranslations } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export const metadata: Metadata = { title: "Impressum" };
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "impressum" });
+  return { title: t("title") };
+}
 
 export default async function ImpressumPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  return <ImpressumContent />;
+}
+
+function ImpressumContent() {
+  const t = useTranslations("impressum");
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Impressum</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">{t("title")}</h1>
       <div className="prose prose-gray max-w-none space-y-6">
         <section>
-          <h2>Angaben gem&#228;ss Art. 3 Abs. 1 lit. s UWG (Schweiz)</h2>
-          <p>
-            <strong>FussMatt</strong><br />
-            Ein Angebot der Royal Road GmbH<br />
-            D&#252;bendorfstrasse 4<br />
-            8051 Z&#252;rich<br />
-            Schweiz
+          <h2>{t("companyTitle")}</h2>
+          <p className="whitespace-pre-line">
+            <strong>FussMatt</strong>{"\n"}{t("companyInfo")}
           </p>
         </section>
 
         <section>
-          <h2>Handelsregistereintrag</h2>
-          <p>
-            Eingetragen im Handelsregister des Kantons Z&#252;rich<br />
-            Handelsregisternummer: CH-020.4.074.049-1<br />
-            Rechtsform: Gesellschaft mit beschr&#228;nkter Haftung (GmbH)
-          </p>
+          <h2>{t("registerTitle")}</h2>
+          <p className="whitespace-pre-line">{t("registerInfo")}</p>
         </section>
 
         <section>
-          <h2>Gesch&#228;ftsf&#252;hrer</h2>
-          <p>Dipl. Ing. Abdurrahman Uyanik</p>
+          <h2>{t("directorTitle")}</h2>
+          <p>{t("directorName")}</p>
         </section>
 
         <section>
-          <h2>Kontakt</h2>
-          <p>
-            E-Mail: info@fussmatt.com<br />
-            Website: www.fussmatt.com
-          </p>
+          <h2>{t("contactTitle")}</h2>
+          <p className="whitespace-pre-line">{t("contactInfo")}</p>
         </section>
 
         {/* TODO: MWST numarası eklenecek — CHE-xxx.xxx.xxx MWST */}
 
         <section>
-          <h2>EU-Streitschlichtung</h2>
+          <h2>{t("euDisputeTitle")}</h2>
           <p>
-            F&#252;r Kunden aus der EU: Die Europ&#228;ische Kommission stellt eine Plattform
-            zur Online-Streitbeilegung (OS) bereit:{" "}
+            {t("euDisputeP1")}{" "}
             <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:text-amber-700">
               https://ec.europa.eu/consumers/odr/
             </a>
           </p>
-          <p>Unsere E-Mail-Adresse finden Sie oben im Impressum.</p>
+          <p>{t("euDisputeP2")}</p>
         </section>
 
         <section>
-          <h2>Haftungsausschluss</h2>
-          <p>
-            Der Autor &#252;bernimmt keine Gew&#228;hr f&#252;r die Richtigkeit, Genauigkeit,
-            Aktualit&#228;t, Zuverl&#228;ssigkeit und Vollst&#228;ndigkeit der Informationen.
-          </p>
-          <p>
-            Haftungsanspr&#252;che gegen den Autor wegen Sch&#228;den materieller oder immaterieller Art,
-            die aus dem Zugriff oder der Nutzung bzw. Nichtnutzung der ver&#246;ffentlichten Informationen,
-            durch Missbrauch der Verbindung oder durch technische St&#246;rungen entstanden sind, werden
-            ausgeschlossen.
-          </p>
+          <h2>{t("disclaimerTitle")}</h2>
+          <p>{t("disclaimerP1")}</p>
+          <p>{t("disclaimerP2")}</p>
         </section>
 
         <section>
-          <h2>Urheberrechte</h2>
-          <p>
-            Die Urheber- und alle anderen Rechte an Inhalten, Bildern, Fotos oder anderen Dateien auf
-            dieser Website geh&#246;ren ausschliesslich der Royal Road GmbH oder den speziell genannten
-            Rechteinhabern. F&#252;r die Reproduktion jeglicher Elemente ist die schriftliche Zustimmung
-            des Urheberrechtstr&#228;gers im Voraus einzuholen.
-          </p>
+          <h2>{t("copyrightTitle")}</h2>
+          <p>{t("copyrightP1")}</p>
         </section>
       </div>
     </div>

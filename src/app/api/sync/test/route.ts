@@ -3,7 +3,7 @@ import { runSyncFromXML } from "@/lib/sync";
 import fs from "fs";
 import path from "path";
 
-const SYNC_SECRET = process.env.SYNC_SECRET_KEY || "fussmatt-sync-2026";
+const SYNC_SECRET = process.env.SYNC_SECRET_KEY;
 
 /**
  * POST /api/sync/test?key=SECRET
@@ -12,10 +12,15 @@ const SYNC_SECRET = process.env.SYNC_SECRET_KEY || "fussmatt-sync-2026";
  * Useful for testing without hitting the real B2B feed.
  */
 export async function POST(request: NextRequest) {
+  // Disable in production
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "Not available in production" }, { status: 404 });
+  }
+
   const body = await request.json();
   const { key, dryRun = false } = body;
 
-  if (key !== SYNC_SECRET) {
+  if (!SYNC_SECRET || key !== SYNC_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

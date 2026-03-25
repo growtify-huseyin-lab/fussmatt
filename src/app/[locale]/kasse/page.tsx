@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useCartStore } from "@/lib/cart-store";
 import { formatPrice } from "@/lib/utils";
 import { Link } from "@/i18n/navigation";
@@ -9,9 +9,11 @@ import type { WCAddress } from "@/types/woocommerce";
 
 export default function KassePage() {
   const t = useTranslations("checkout");
+  const locale = useLocale();
   const { items, totalPrice, clearCart } = useCartStore();
   const [loading, setLoading] = useState(false);
-  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [agbAccepted, setAgbAccepted] = useState(false);
   const [billing, setBilling] = useState<WCAddress>({
     first_name: "", last_name: "", company: "", address_1: "", address_2: "",
     city: "", state: "", postcode: "", country: "DE", email: "", phone: "",
@@ -24,33 +26,38 @@ export default function KassePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     try {
-      const res = await fetch("/api/orders", {
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          payment_method: "stripe", payment_method_title: "Card", set_paid: false,
-          billing, shipping: billing,
-          line_items: items.map((item) => ({ product_id: item.product.id, variation_id: item.variation?.id || 0, quantity: item.quantity })),
+          billing,
+          shipping: billing,
+          locale,
+          line_items: items.map((item) => ({
+            product_id: item.product.id,
+            variation_id: item.variation?.id || 0,
+            quantity: item.quantity,
+            name: item.product.name,
+            price: parseFloat(item.variation?.price || item.product.price),
+          })),
         }),
       });
-      if (res.ok) { clearCart(); setOrderPlaced(true); }
-    } catch (err) { console.error("Order error:", err); }
-    finally { setLoading(false); }
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.sessionUrl) {
+        clearCart();
+        window.location.href = data.sessionUrl;
+      } else {
+        setError(data?.error || t("orderError"));
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      setError(t("orderError"));
+    } finally {
+      setLoading(false);
+    }
   };
-
-  if (orderPlaced) {
-    return (
-      <div className="max-w-lg mx-auto px-4 py-24 text-center">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.5 12.75l6 6 9-13.5" /></svg>
-        </div>
-        <h1 className="text-2xl font-bold text-gray-900">{t("thankYou")}</h1>
-        <p className="mt-3 text-gray-500">{t("confirmEmail")}</p>
-        <Link href="/" className="mt-6 inline-block px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-xl transition-colors">{t("backToShop")}</Link>
-      </div>
-    );
-  }
 
   if (items.length === 0) {
     return (
@@ -114,7 +121,30 @@ export default function KassePage() {
               </div>
               <p className="text-xs text-gray-500 mt-1 text-right">{t("inclVat")}</p>
             </div>
-            <button type="submit" disabled={loading} className="mt-6 w-full bg-amber-600 hover:bg-amber-700 disabled:bg-gray-300 text-white py-3 rounded-xl font-medium transition-colors">
+            {error && (
+              <div role="alert" className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+                {error}
+              </div>
+            )}
+            <label className="mt-4 flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                required
+                checked={agbAccepted}
+                onChange={(e) => setAgbAccepted(e.target.checked)}
+                className="mt-0.5 w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+              />
+              <span className="text-xs text-gray-600 leading-relaxed">
+                {t("agbAccept")}{" "}
+                <Link href="/agb" className="text-amber-600 hover:text-amber-700 underline" target="_blank">{t("agbLink")}</Link>
+                {" "}{t("agbAnd")}{" "}
+                <Link href="/datenschutz" className="text-amber-600 hover:text-amber-700 underline" target="_blank">{t("privacyLink")}</Link>
+                {" "}{t("agbAnd")}{" "}
+                <Link href="/widerruf" className="text-amber-600 hover:text-amber-700 underline" target="_blank">{t("withdrawalLink")}</Link>
+                {" "}{t("agbRead")}
+              </span>
+            </label>
+            <button type="submit" disabled={loading || !agbAccepted} className="mt-4 w-full bg-amber-600 hover:bg-amber-700 disabled:bg-gray-300 text-white py-3 rounded-xl font-medium transition-colors">
               {loading ? t("processing") : t("placeOrder")}
             </button>
           </div>

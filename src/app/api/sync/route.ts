@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runSync, runStockSync, readTodayLog } from "@/lib/sync";
 
-const SYNC_SECRET = process.env.SYNC_SECRET_KEY || "fussmatt-sync-2026";
+const SYNC_SECRET = process.env.SYNC_SECRET_KEY;
 
 /**
  * GET /api/sync?key=SECRET
@@ -12,7 +12,7 @@ const SYNC_SECRET = process.env.SYNC_SECRET_KEY || "fussmatt-sync-2026";
  */
 export async function GET(request: NextRequest) {
   const key = request.nextUrl.searchParams.get("key");
-  if (key !== SYNC_SECRET) {
+  if (!SYNC_SECRET || key !== SYNC_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Auth check
-    if (key !== SYNC_SECRET) {
+    if (!SYNC_SECRET || key !== SYNC_SECRET) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

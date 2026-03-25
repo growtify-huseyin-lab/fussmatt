@@ -18,35 +18,8 @@ export const localeFlags: Record<Locale, string> = {
   nl: "\uD83C\uDDF3\uD83C\uDDF1",
 };
 
-// URL path mapping per locale
-export const pathnames = {
-  "/": "/",
-  "/produkte": {
-    de: "/produkte",
-    en: "/products",
-    fr: "/produits",
-    it: "/prodotti",
-    nl: "/producten",
-  },
-  "/produkt/[slug]": {
-    de: "/produkt/[slug]",
-    en: "/product/[slug]",
-    fr: "/produit/[slug]",
-    it: "/prodotto/[slug]",
-    nl: "/product/[slug]",
-  },
-  "/warenkorb": {
-    de: "/warenkorb",
-    en: "/cart",
-    fr: "/panier",
-    it: "/carrello",
-    nl: "/winkelwagen",
-  },
-  "/kasse": {
-    de: "/kasse",
-    en: "/checkout",
-    fr: "/caisse",
-    it: "/cassa",
-    nl: "/afrekenen",
-  },
-} as const;
+// NOTE: Localized URL paths (e.g. /en/products instead of /en/produkte)
+// intentionally deferred to post-launch. All locales currently use German
+// path segments. This avoids the complexity of rewriting file-system routes,
+// updating middleware, and managing redirects before launch.
+// See: https://next-intl.dev/docs/routing#pathnames

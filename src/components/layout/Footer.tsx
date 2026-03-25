@@ -1,3 +1,6 @@
+"use client";
+
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
@@ -11,7 +14,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <img src="/logo.png" alt="FussMatt" className="h-12 w-auto brightness-0 invert" />
+            <Image src="/logo.png" alt="FussMatt" width={160} height={48} className="h-12 w-auto brightness-0 invert" />
             <p className="mt-4 text-sm leading-relaxed">{t("tagline")}</p>
           </div>
 
@@ -29,9 +32,9 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">{t("infoTitle")}</h3>
             <ul className="space-y-3">
-              <li><a href="/versand" className="text-sm hover:text-amber-500 transition-colors">{t("shippingLink")}</a></li>
-              <li><a href="/rueckgabe" className="text-sm hover:text-amber-500 transition-colors">{t("returnLink")}</a></li>
-              <li><a href="/kontakt" className="text-sm hover:text-amber-500 transition-colors">{t("contactLink")}</a></li>
+              <li><Link href="/versand" className="text-sm hover:text-amber-500 transition-colors">{t("shippingLink")}</Link></li>
+              <li><Link href="/widerruf" className="text-sm hover:text-amber-500 transition-colors">{t("returnLink")}</Link></li>
+              <li><Link href="/kontakt" className="text-sm hover:text-amber-500 transition-colors">{t("contactLink")}</Link></li>
             </ul>
           </div>
 
@@ -39,16 +42,24 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">{t("legalTitle")}</h3>
             <ul className="space-y-3">
-              <li><a href="/impressum" className="text-sm hover:text-amber-500 transition-colors">{t("imprint")}</a></li>
-              <li><a href="/datenschutz" className="text-sm hover:text-amber-500 transition-colors">{t("privacy")}</a></li>
-              <li><a href="/agb" className="text-sm hover:text-amber-500 transition-colors">{t("terms")}</a></li>
-              <li><a href="/widerruf" className="text-sm hover:text-amber-500 transition-colors">{t("withdrawal")}</a></li>
+              <li><Link href="/impressum" className="text-sm hover:text-amber-500 transition-colors">{t("imprint")}</Link></li>
+              <li><Link href="/datenschutz" className="text-sm hover:text-amber-500 transition-colors">{t("privacy")}</Link></li>
+              <li><Link href="/agb" className="text-sm hover:text-amber-500 transition-colors">{t("terms")}</Link></li>
+              <li><Link href="/widerruf" className="text-sm hover:text-amber-500 transition-colors">{t("withdrawal")}</Link></li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs">{t("copyright", { year: new Date().getFullYear() })}</p>
+          <div className="flex items-center gap-4">
+            <p className="text-xs">{t("copyright", { year: new Date().getFullYear() })}</p>
+            <button
+              onClick={() => window.dispatchEvent(new Event("open-cookie-settings"))}
+              className="text-xs text-gray-500 hover:text-amber-500 transition-colors underline"
+            >
+              {t("cookieSettings")}
+            </button>
+          </div>
           <div className="flex items-center gap-4">
             <span className="text-xs">{t("paymentMethods")}:</span>
             <div className="flex items-center gap-2 text-xs font-medium text-gray-500">

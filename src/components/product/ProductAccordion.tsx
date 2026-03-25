@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import type { WCAttribute } from "@/types/woocommerce";
 
 interface AccordionSection {
@@ -16,6 +17,7 @@ interface ProductAccordionProps {
 
 export default function ProductAccordion({ description, attributes }: ProductAccordionProps) {
   const [openSection, setOpenSection] = useState<string>("beschreibung");
+  const t = useTranslations("productTabs");
 
   const toggle = (id: string) => {
     setOpenSection(openSection === id ? "" : id);
@@ -27,7 +29,7 @@ export default function ProductAccordion({ description, attributes }: ProductAcc
   if (description) {
     sections.push({
       id: "beschreibung",
-      title: "Beschreibung",
+      title: t("description"),
       content: (
         <div
           className="prose prose-sm prose-gray max-w-none"
@@ -37,11 +39,11 @@ export default function ProductAccordion({ description, attributes }: ProductAcc
     });
   }
 
-  // Zusätzliche Informationen — attribute table (like MyFussmatten)
+  // Zusätzliche Informationen — attribute table
   if (attributes.length > 0) {
     sections.push({
       id: "zusatzinfo",
-      title: "Zus\u00e4tzliche Informationen",
+      title: t("additionalInfo"),
       content: (
         <table className="w-full text-sm">
           <tbody>
@@ -69,21 +71,21 @@ export default function ProductAccordion({ description, attributes }: ProductAcc
   // Versand & Rückgabe
   sections.push({
     id: "versand",
-    title: "Versand & R\u00fcckgabe",
+    title: t("shippingReturn"),
     content: (
       <div className="text-sm text-gray-600 space-y-3">
         <div className="flex items-start gap-3">
           <span className="text-lg">{"\uD83D\uDE9A"}</span>
           <div>
-            <p className="font-medium text-gray-900">Kostenloser Versand</p>
-            <p>Ab CHF 50 in der Schweiz. Lieferzeit: 3&#8211;5 Werktage.</p>
+            <p className="font-medium text-gray-900">{t("freeShipping")}</p>
+            <p>{t("freeShippingDesc")}</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <span className="text-lg">{"\u21A9\uFE0F"}</span>
           <div>
-            <p className="font-medium text-gray-900">30 Tage R&#252;ckgaberecht</p>
-            <p>Unbenutzte Ware in Originalverpackung zur&#252;cksenden.</p>
+            <p className="font-medium text-gray-900">{t("returnPolicy")}</p>
+            <p>{t("returnPolicyDesc")}</p>
           </div>
         </div>
       </div>

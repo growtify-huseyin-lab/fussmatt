@@ -8,8 +8,16 @@ import {
 import type { TranslatableProductFields } from "@/lib/translations";
 import type { Locale } from "@/i18n/config";
 
+const SYNC_SECRET = process.env.SYNC_SECRET_KEY;
+
+function isAuthorized(request: NextRequest): boolean {
+  const key = request.nextUrl.searchParams.get("key") ||
+    request.headers.get("x-api-key");
+  return !!SYNC_SECRET && key === SYNC_SECRET;
+}
+
 /**
- * GET /api/translations
+ * GET /api/translations?key=SECRET
  * Returns translation store & stats.
  *
  * Query params:
@@ -17,6 +25,9 @@ import type { Locale } from "@/i18n/config";
  *   (no params)     — get full store + stats
  */
 export async function GET(request: NextRequest) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const productId = request.nextUrl.searchParams.get("productId");
 
   if (productId) {
@@ -41,6 +52,10 @@ export async function GET(request: NextRequest) {
  *   { entries: [{ productId: 123, locale: "en", fields: {...} }, ...] }
  */
 export async function POST(request: NextRequest) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
 

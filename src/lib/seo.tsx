@@ -67,7 +67,7 @@ export function productSchema(product: WCProduct, locale: Locale) {
     offers: {
       "@type": "Offer",
       url,
-      priceCurrency: "EUR",
+      priceCurrency: "CHF",
       price: product.price,
       availability: product.stock_status === "instock"
         ? "https://schema.org/InStock"
@@ -82,7 +82,7 @@ export function productSchema(product: WCProduct, locale: Locale) {
         shippingRate: {
           "@type": "MonetaryAmount",
           value: "0",
-          currency: "EUR",
+          currency: "CHF",
         },
         shippingDestination: {
           "@type": "DefinedRegion",
@@ -110,7 +110,7 @@ export function productSchema(product: WCProduct, locale: Locale) {
     (schema.offers as Record<string, unknown>).priceSpecification = {
       "@type": "PriceSpecification",
       price: product.price,
-      priceCurrency: "EUR",
+      priceCurrency: "CHF",
       valueAddedTaxIncluded: true,
     };
   }

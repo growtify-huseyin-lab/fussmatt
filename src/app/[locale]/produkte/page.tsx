@@ -6,6 +6,16 @@ import ProductCard from "@/components/product/ProductCard";
 import type { Locale } from "@/i18n/config";
 import type { WCProduct, WCCategory } from "@/types/woocommerce";
 
+const ALLOWED_CATEGORY_SLUGS = [
+  "5d-fussmatten",
+  "3d-fussmatten",
+  "passend-fuer-lkw-truck-fussmatten",
+  "passend-fuer-kleinbus-pickup-fussmatten",
+  "universal-fussmatten",
+  "kofferraummatte",
+  "fuss-und-kofferraummatten-set",
+];
+
 export const metadata: Metadata = {
   title: "Alle Fussmatten",
 };
@@ -35,10 +45,9 @@ export default async function ProduktePage({
     }
     if (search) productParams.search = search;
 
-    [products, categories] = await Promise.all([
-      getLocalizedProducts(locale as Locale, productParams),
-      getLocalizedCategories(locale as Locale, { parent: 0 }),
-    ]);
+    const allCategories = await getLocalizedCategories(locale as Locale, { per_page: 100 });
+    categories = allCategories.filter((cat) => ALLOWED_CATEGORY_SLUGS.includes(cat.slug));
+    products = await getLocalizedProducts(locale as Locale, productParams);
   } catch {
     // API error
   }
@@ -76,7 +85,7 @@ function ProdukteContent({ products, categories, kategorie, search, page }: {
             </form>
             {categories.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">{t("brands")}</h3>
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">{t("categories")}</h3>
                 <ul className="space-y-1">
                   {categories.map((cat) => (
                     <li key={cat.id}>

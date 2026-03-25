@@ -1,13 +1,33 @@
+import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { getLocalizedProducts, getLocalizedCategories } from "@/lib/woocommerce-i18n";
+import { getLocalizedProducts } from "@/lib/woocommerce-i18n";
 import { fetchVehicleHierarchy } from "@/lib/vehicle-data";
 import ProductCard from "@/components/product/ProductCard";
 import VehicleFilter from "@/components/product/VehicleFilter";
 import type { Locale } from "@/i18n/config";
 import type { VehicleBrand } from "@/lib/vehicle-data";
-import type { WCProduct, WCCategory } from "@/types/woocommerce";
+import type { WCProduct } from "@/types/woocommerce";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "homeMeta" });
+
+  return {
+    title: t("title"),
+    description: t("description"),
+    openGraph: {
+      title: t("title"),
+      description: t("ogDescription"),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("title"),
+      description: t("ogDescription"),
+    },
+  };
+}
 
 export default async function HomePage({
   params,
@@ -18,29 +38,25 @@ export default async function HomePage({
   setRequestLocale(locale);
 
   let products: WCProduct[] = [];
-  let categories: WCCategory[] = [];
   let vehicleBrands: VehicleBrand[] = [];
 
   try {
-    [products, categories, vehicleBrands] = await Promise.all([
+    [products, vehicleBrands] = await Promise.all([
       getLocalizedProducts(locale as Locale, { per_page: 8, orderby: "date" }),
-      getLocalizedCategories(locale as Locale, { parent: 0 }),
       fetchVehicleHierarchy(),
     ]);
   } catch {
     // API not available yet
   }
 
-  return <HomeContent products={products} categories={categories} vehicleBrands={vehicleBrands} />;
+  return <HomeContent products={products} vehicleBrands={vehicleBrands} />;
 }
 
 function HomeContent({
   products,
-  categories,
   vehicleBrands,
 }: {
   products: WCProduct[];
-  categories: WCCategory[];
   vehicleBrands: VehicleBrand[];
 }) {
   const t = useTranslations("home");
@@ -124,23 +140,29 @@ function HomeContent({
           ))}
         </div>
 
-        {/* Brand chips */}
-        {categories.length > 0 && (
-          <div className="mt-8">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">{t("brandsTitle")}</h3>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/produkte?kategorie=${cat.slug}`}
-                  className="px-4 py-2 bg-gray-100 hover:bg-amber-50 hover:text-amber-700 text-sm font-medium text-gray-700 rounded-full transition-colors"
-                >
-                  {cat.name} <span className="text-gray-400 text-xs">({cat.count})</span>
-                </Link>
-              ))}
-            </div>
+        {/* Category chips — matches header navigation */}
+        <div className="mt-8">
+          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">{t("categoriesTitle")}</h3>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: t("cat5d"), href: "/kategorie/5d-fussmatten" },
+              { label: t("cat3d"), href: "/kategorie/3d-fussmatten" },
+              { label: t("catTruck"), href: "/kategorie/passend-fuer-lkw-truck-fussmatten" },
+              { label: t("catVan"), href: "/kategorie/passend-fuer-kleinbus-pickup-fussmatten" },
+              { label: t("catUniversal"), href: "/kategorie/universal-fussmatten" },
+              { label: t("catTrunk"), href: "/kategorie/kofferraummatte" },
+              { label: t("catSet"), href: "/kategorie/fuss-und-kofferraummatten-set" },
+            ].map((cat) => (
+              <Link
+                key={cat.href}
+                href={cat.href}
+                className="px-4 py-2 bg-gray-100 hover:bg-amber-50 hover:text-amber-700 text-sm font-medium text-gray-700 rounded-full transition-colors"
+              >
+                {cat.label}
+              </Link>
+            ))}
           </div>
-        )}
+        </div>
       </section>
 
       {/* Featured Products */}

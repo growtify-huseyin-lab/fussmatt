@@ -99,6 +99,13 @@ export async function createOrder(orderData: Record<string, unknown>) {
   });
 }
 
+export async function updateOrder(orderId: number, data: Record<string, unknown>) {
+  return wcFetch(`/orders/${orderId}`, {}, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
 // ─── Search ─────────────────────────────────────────────
 export async function searchProducts(query: string): Promise<WCProduct[]> {
   return wcFetch<WCProduct[]>("/products", {
