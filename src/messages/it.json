@@ -16,12 +16,12 @@
     "badge": "Materiale TPE Premium",
     "title1": "Tappetini auto",
     "title2": "su misura",
-    "description": "Tappetini 3D e 5D in TPE di alta qualit\u00e0. Realizzati al millimetro per il tuo veicolo. Resistenti ad acqua e sporco.",
+    "description": "Tappetini 3D e 5D in TPE di alta qualit\u00e0. Realizzati al millimetro per il Suo veicolo. Resistenti ad acqua e sporco.",
     "cta": "Scopri ora"
   },
   "usp": {
     "fitTitle": "Su misura",
-    "fitDesc": "Per il tuo modello di veicolo",
+    "fitDesc": "Per il Suo modello di veicolo",
     "waterTitle": "Impermeabile",
     "waterDesc": "Materiale TPE",
     "shipTitle": "Spedizione gratuita",
@@ -41,7 +41,7 @@
     "feature1Title": "Materiale TPE Premium",
     "feature1Desc": "Ecologico, inodore e estremamente resistente. Flessibile fino a -40\u00b0C.",
     "feature2Title": "Misurazione 3D",
-    "feature2Desc": "Ogni tappetino \u00e8 tagliato al millimetro tramite scansione 3D per il tuo veicolo.",
+    "feature2Desc": "Ogni tappetino \u00e8 tagliato al millimetro tramite scansione 3D per il Suo veicolo.",
     "feature3Title": "Montaggio facile",
     "feature3Desc": "Calzata perfetta senza taglio. Basta posizionare e il gioco \u00e8 fatto."
   },
@@ -76,7 +76,7 @@
   },
   "cart": {
     "title": "Carrello",
-    "empty": "Il tuo carrello \u00e8 vuoto",
+    "empty": "Il Suo carrello \u00e8 vuoto",
     "shopNow": "Acquista ora",
     "subtotal": "Subtotale",
     "vatNote": "IVA inclusa. Spese di spedizione calcolate alla cassa.",
@@ -110,13 +110,13 @@
     "inclVat": "IVA inclusa",
     "placeOrder": "Ordina con obbligo di pagamento",
     "processing": "Elaborazione...",
-    "thankYou": "Grazie per il tuo ordine!",
+    "thankYou": "Grazie per il Suo ordine!",
     "confirmEmail": "Riceverai a breve un\u2019e-mail di conferma.",
     "backToShop": "Torna al negozio",
-    "emptyCart": "Il tuo carrello \u00e8 vuoto."
+    "emptyCart": "Il Suo carrello \u00e8 vuoto."
   },
   "footer": {
-    "tagline": "Tappetini auto 3D e 5D premium in TPE. Su misura per il tuo veicolo.",
+    "tagline": "Tappetini auto 3D e 5D premium in TPE. Su misura per il Suo veicolo.",
     "shopTitle": "Negozio",
     "infoTitle": "Informazioni",
     "shippingLink": "Spedizione e consegna",
@@ -134,7 +134,7 @@
     "switchLabel": "Seleziona lingua"
   },
   "filter": {
-    "title": "Trova i tuoi tappetini",
+    "title": "Trova i Suoi tappetini",
     "selectBrand": "Seleziona marca",
     "selectModel": "Seleziona modello",
     "search": "Cerca",
