@@ -131,35 +131,54 @@ export async function fetchVehicleHierarchy(): Promise<VehicleBrand[]> {
   const WP_PASS = process.env.WP_APPLICATION_PASSWORD || "";
 
   try {
-    // Build URL with auth
-    const url = new URL(`${WP_URL}/wp-json/wc/v3/products?per_page=100&status=publish`);
-    const headers: Record<string, string> = {};
+    // Build auth params
+    const authHeaders: Record<string, string> = {};
+    const authParams: Record<string, string> = {};
     if (WP_USER && WP_PASS) {
-      headers["Authorization"] = `Basic ${Buffer.from(`${WP_USER}:${WP_PASS}`).toString("base64")}`;
+      authHeaders["Authorization"] = `Basic ${Buffer.from(`${WP_USER}:${WP_PASS}`).toString("base64")}`;
     } else if (WC_KEY && WC_SECRET) {
-      url.searchParams.set("consumer_key", WC_KEY);
-      url.searchParams.set("consumer_secret", WC_SECRET);
+      authParams["consumer_key"] = WC_KEY;
+      authParams["consumer_secret"] = WC_SECRET;
     }
 
-    const res = await fetch(url.toString(), {
-      headers,
-      next: { revalidate: 3600 },
-    });
-
-    if (!res.ok) return [];
-
-    const products = (await res.json()) as Array<{
-      attributes: Array<{ name: string; options: string[] }>;
-    }>;
-
+    // Paginate through all products to build complete hierarchy
     const vehicleStrings: string[] = [];
-    for (const product of products) {
-      const fahrzeugAttr = product.attributes.find(
-        (a) => a.name.toLowerCase() === "fahrzeug" || a.name.toLowerCase() === "vehicle"
-      );
-      if (fahrzeugAttr?.options) {
-        vehicleStrings.push(...fahrzeugAttr.options);
+    let page = 1;
+    const maxPages = 15; // safety limit
+
+    while (page <= maxPages) {
+      const url = new URL(`${WP_URL}/wp-json/wc/v3/products`);
+      url.searchParams.set("per_page", "100");
+      url.searchParams.set("page", String(page));
+      url.searchParams.set("status", "publish");
+      for (const [k, v] of Object.entries(authParams)) {
+        url.searchParams.set(k, v);
       }
+
+      const res = await fetch(url.toString(), {
+        headers: authHeaders,
+        next: { revalidate: 3600 },
+      });
+
+      if (!res.ok) break;
+
+      const products = (await res.json()) as Array<{
+        attributes: Array<{ name: string; options: string[] }>;
+      }>;
+
+      if (products.length === 0) break;
+
+      for (const product of products) {
+        const fahrzeugAttr = product.attributes.find(
+          (a) => a.name.toLowerCase() === "fahrzeug" || a.name.toLowerCase() === "vehicle"
+        );
+        if (fahrzeugAttr?.options) {
+          vehicleStrings.push(...fahrzeugAttr.options);
+        }
+      }
+
+      if (products.length < 100) break;
+      page++;
     }
 
     return buildVehicleHierarchy(vehicleStrings);

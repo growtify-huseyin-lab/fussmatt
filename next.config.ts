@@ -15,16 +15,20 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       {
+        protocol: "https",
+        hostname: "fussmatt.com",
+      },
+      {
         protocol: "http",
         hostname: "fussmatt.local",
       },
       {
         protocol: "https",
-        hostname: "fussmatt.local",
+        hostname: "**.fussmattenprofi.com",
       },
       {
         protocol: "https",
-        hostname: "**.fussmattenprofi.com",
+        hostname: "cdn.fussmattenprofi.com",
       },
       {
         protocol: "https",

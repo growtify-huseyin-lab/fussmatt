@@ -58,8 +58,8 @@ export default function VehicleFilter({
               className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl text-base text-gray-700 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none appearance-none cursor-pointer transition-colors"
             >
               <option value="">{t("selectBrand")}</option>
-              {brands.map((b) => (
-                <option key={b.slug} value={b.slug}>{b.name}</option>
+              {brands.map((b, i) => (
+                <option key={`${b.slug}-${i}`} value={b.slug}>{b.name}</option>
               ))}
             </select>
             <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
