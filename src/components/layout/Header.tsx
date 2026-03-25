@@ -51,7 +51,7 @@ export default function Header() {
               alt="FussMatt"
               width={220}
               height={55}
-              className="h-10 lg:h-14 w-auto"
+              className="h-12 lg:h-16 w-auto"
               priority
             />
           </Link>
