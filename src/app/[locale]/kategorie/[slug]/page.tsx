@@ -49,19 +49,24 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const category = await getLocalizedCategoryBySlug(locale as Locale, slug);
+  let category: WCCategory | null = null;
+  try {
+    category = await getLocalizedCategoryBySlug(locale as Locale, slug);
+  } catch { /* API error */ }
   if (!category) notFound();
 
   let products: WCProduct[] = [];
   let allCategories: WCCategory[] = [];
   let vehicleBrands: VehicleBrand[] = [];
   try {
-    [products, allCategories, vehicleBrands] = await Promise.all([
+    [products, allCategories] = await Promise.all([
       getLocalizedProducts(locale as Locale, { category: category.id, per_page: 50 }),
       getLocalizedCategories(locale as Locale, { parent: 0 }),
-      fetchVehicleHierarchy(),
     ]);
   } catch { /* */ }
+  try {
+    vehicleBrands = await fetchVehicleHierarchy();
+  } catch { /* vehicle data timeout — filter won't show */ }
 
   const seo = CATEGORY_SEO[slug];
 
