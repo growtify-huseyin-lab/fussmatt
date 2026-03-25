@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
   description:
     "Premium 3D & 5D Auto-Fussmatten aus TPE-Material. Passgenau f\u00fcr Ihr Fahrzeug.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://fussmatt.com"),
   openGraph: {
     type: "website",
     siteName: "FussMatt",

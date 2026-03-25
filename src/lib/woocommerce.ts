@@ -1,6 +1,6 @@
 import type { WCProduct, WCCategory, WCProductVariation } from "@/types/woocommerce";
 
-const WORDPRESS_URL = process.env.WORDPRESS_URL || "http://fussmatt.local";
+const WORDPRESS_URL = process.env.WORDPRESS_URL || "";
 const WC_KEY = process.env.WC_CONSUMER_KEY || "";
 const WC_SECRET = process.env.WC_CONSUMER_SECRET || "";
 const WP_USER = process.env.WP_APPLICATION_USER || "";

@@ -75,23 +75,38 @@ export function buildVehicleHierarchy(vehicleStrings: string[]): VehicleBrand[] 
     if (!models.has(modelKey)) {
       models.set(modelKey, {
         name: parsed.model,
-        slug: slugify(`${parsed.brand}-${parsed.model}-${parsed.years}`),
+        slug: slugify(`${parsed.brand}-${parsed.model}-${parsed.years}`) || `${slugify(parsed.brand)}-${Date.now()}`,
         years: parsed.years,
         fullName: str,
       });
     }
   }
 
-  // Sort brands alphabetically
+  // Sort brands alphabetically, ensure unique slugs
   const brands: VehicleBrand[] = [];
   const sortedBrands = [...brandMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  const usedBrandSlugs = new Set<string>();
 
   for (const [brandName, models] of sortedBrands) {
-    brands.push({
-      name: brandName,
-      slug: slugify(brandName),
-      models: [...models.values()].sort((a, b) => a.name.localeCompare(b.name)),
-    });
+    let brandSlug = slugify(brandName);
+    if (usedBrandSlugs.has(brandSlug)) {
+      brandSlug = `${brandSlug}-${usedBrandSlugs.size}`;
+    }
+    usedBrandSlugs.add(brandSlug);
+
+    // Deduplicate model slugs
+    const usedModelSlugs = new Set<string>();
+    const uniqueModels: VehicleModel[] = [];
+    for (const m of [...models.values()].sort((a, b) => a.name.localeCompare(b.name))) {
+      let mSlug = m.slug;
+      if (usedModelSlugs.has(mSlug)) {
+        mSlug = `${mSlug}-${usedModelSlugs.size}`;
+      }
+      usedModelSlugs.add(mSlug);
+      uniqueModels.push({ ...m, slug: mSlug });
+    }
+
+    brands.push({ name: brandName, slug: brandSlug, models: uniqueModels });
   }
 
   return brands;
@@ -108,21 +123,28 @@ function slugify(str: string): string {
  * Fetch vehicle hierarchy from WooCommerce products.
  */
 export async function fetchVehicleHierarchy(): Promise<VehicleBrand[]> {
-  const WP_URL = process.env.WORDPRESS_URL || "http://fussmatt.local";
+  const WP_URL = process.env.WORDPRESS_URL;
+  if (!WP_URL) return [];
+  const WC_KEY = process.env.WC_CONSUMER_KEY || "";
+  const WC_SECRET = process.env.WC_CONSUMER_SECRET || "";
   const WP_USER = process.env.WP_APPLICATION_USER || "";
   const WP_PASS = process.env.WP_APPLICATION_PASSWORD || "";
 
   try {
-    // Fetch all products and extract Fahrzeug attribute
-    const res = await fetch(
-      `${WP_URL}/wp-json/wc/v3/products?per_page=100&status=publish`,
-      {
-        headers: {
-          Authorization: `Basic ${Buffer.from(`${WP_USER}:${WP_PASS}`).toString("base64")}`,
-        },
-        next: { revalidate: 3600 }, // cache 1 hour
-      }
-    );
+    // Build URL with auth
+    const url = new URL(`${WP_URL}/wp-json/wc/v3/products?per_page=100&status=publish`);
+    const headers: Record<string, string> = {};
+    if (WP_USER && WP_PASS) {
+      headers["Authorization"] = `Basic ${Buffer.from(`${WP_USER}:${WP_PASS}`).toString("base64")}`;
+    } else if (WC_KEY && WC_SECRET) {
+      url.searchParams.set("consumer_key", WC_KEY);
+      url.searchParams.set("consumer_secret", WC_SECRET);
+    }
+
+    const res = await fetch(url.toString(), {
+      headers,
+      next: { revalidate: 3600 },
+    });
 
     if (!res.ok) return [];
 

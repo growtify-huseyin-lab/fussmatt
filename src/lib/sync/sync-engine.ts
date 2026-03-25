@@ -19,7 +19,7 @@ import { validateGTIN } from "./gtin";
 import { sanitizeProduct } from "./brand-sanitizer";
 import { logInfo, logError, logProductCreated, logProductUpdated } from "./logger";
 
-const WP_URL = process.env.WORDPRESS_URL || "http://fussmatt.local";
+const WP_URL = process.env.WORDPRESS_URL || "";
 const WP_USER = process.env.WP_APPLICATION_USER || "";
 const WP_PASS = process.env.WP_APPLICATION_PASSWORD || "";
 const AUTH_HEADER = `Basic ${Buffer.from(`${WP_USER}:${WP_PASS}`).toString("base64")}`;

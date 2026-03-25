@@ -4,6 +4,24 @@ import { fetchVehicleHierarchy } from "@/lib/vehicle-data";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://fussmatt.com";
 
+function wcFetchUrl(endpoint: string): { url: string; headers: Record<string, string> } {
+  const WP_URL = process.env.WORDPRESS_URL;
+  if (!WP_URL) return { url: "", headers: {} };
+  const WP_USER = process.env.WP_APPLICATION_USER || "";
+  const WP_PASS = process.env.WP_APPLICATION_PASSWORD || "";
+  const WC_KEY = process.env.WC_CONSUMER_KEY || "";
+  const WC_SECRET = process.env.WC_CONSUMER_SECRET || "";
+  const u = new URL(`${WP_URL}/wp-json/wc/v3${endpoint}`);
+  const headers: Record<string, string> = {};
+  if (WP_USER && WP_PASS) {
+    headers["Authorization"] = `Basic ${Buffer.from(`${WP_USER}:${WP_PASS}`).toString("base64")}`;
+  } else if (WC_KEY && WC_SECRET) {
+    u.searchParams.set("consumer_key", WC_KEY);
+    u.searchParams.set("consumer_secret", WC_SECRET);
+  }
+  return { url: u.toString(), headers };
+}
+
 function localeAlternates(path: string) {
   return { languages: Object.fromEntries(locales.map((l) => [l, `${SITE_URL}/${l}${path}`])) };
 }
@@ -60,10 +78,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // ─── Category pages (/kategorie/[slug]/) ──────────────
   try {
-    const WP_URL = process.env.WORDPRESS_URL || "http://fussmatt.local";
-    const auth = `Basic ${Buffer.from(`${process.env.WP_APPLICATION_USER}:${process.env.WP_APPLICATION_PASSWORD}`).toString("base64")}`;
-    const res = await fetch(`${WP_URL}/wp-json/wc/v3/products/categories?per_page=100&hide_empty=1`, {
-      headers: { Authorization: auth },
+    const catReq = wcFetchUrl("/products/categories?per_page=100&hide_empty=1");
+    if (!catReq.url) throw new Error("No WP URL");
+    const res = await fetch(catReq.url, {
+      headers: catReq.headers,
       next: { revalidate: 3600 },
     });
     if (res.ok) {
@@ -84,10 +102,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // ─── Product pages (/produkt/[slug]/) ─────────────────
   try {
-    const WP_URL = process.env.WORDPRESS_URL || "http://fussmatt.local";
-    const auth = `Basic ${Buffer.from(`${process.env.WP_APPLICATION_USER}:${process.env.WP_APPLICATION_PASSWORD}`).toString("base64")}`;
-    const res = await fetch(`${WP_URL}/wp-json/wc/v3/products?per_page=100&status=publish`, {
-      headers: { Authorization: auth },
+    const prodReq = wcFetchUrl("/products?per_page=100&status=publish");
+    if (!prodReq.url) throw new Error("No WP URL");
+    const res = await fetch(prodReq.url, {
+      headers: prodReq.headers,
       next: { revalidate: 3600 },
     });
     if (res.ok) {

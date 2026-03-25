@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <img src="/logo.png" alt="FussMatt" className="h-8 w-auto brightness-0 invert" />
+            <img src="/logo.png" alt="FussMatt" className="h-12 w-auto brightness-0 invert" />
             <p className="mt-4 text-sm leading-relaxed">{t("tagline")}</p>
           </div>
 

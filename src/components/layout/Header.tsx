@@ -49,9 +49,9 @@ export default function Header() {
             <Image
               src="/logo.png"
               alt="FussMatt"
-              width={180}
-              height={45}
-              className="h-8 lg:h-10 w-auto"
+              width={220}
+              height={55}
+              className="h-10 lg:h-14 w-auto"
               priority
             />
           </Link>

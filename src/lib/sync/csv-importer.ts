@@ -16,12 +16,12 @@ import { validateGTIN } from "./gtin";
 import { logInfo, logError, logProductCreated, logProductUpdated } from "./logger";
 import type { SyncResult, SyncError } from "./types";
 
-const WP_URL = process.env.WORDPRESS_URL || "http://fussmatt.local";
+const WP_URL = process.env.WORDPRESS_URL || "";
 const WP_USER = process.env.WP_APPLICATION_USER || "";
 const WP_PASS = process.env.WP_APPLICATION_PASSWORD || "";
 const AUTH_HEADER = `Basic ${Buffer.from(`${WP_USER}:${WP_PASS}`).toString("base64")}`;
 
-const PRICE_MARKUP_CHF = 9; // +9 CHF on all products
+const PRICE_MARKUP_CHF = 10; // +10 CHF on all products
 
 // ─── WC API ─────────────────────────────────────────────
 
