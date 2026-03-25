@@ -15,19 +15,9 @@ interface BrandPageProps {
   params: Promise<{ locale: string; brand: string }>;
 }
 
+// Only pre-generate top brands to keep build fast. Rest via ISR.
 export async function generateStaticParams() {
-  try {
-    const brands = await fetchVehicleHierarchy();
-    const params = [];
-    for (const locale of locales) {
-      for (const brand of brands) {
-        params.push({ locale, brand: brand.slug });
-      }
-    }
-    return params;
-  } catch {
-    return [];
-  }
+  return [];
 }
 
 export async function generateMetadata({ params }: BrandPageProps): Promise<Metadata> {

@@ -13,21 +13,10 @@ interface ModelPageProps {
   params: Promise<{ locale: string; brand: string; model: string }>;
 }
 
+// Skip static generation for model pages — too many combinations.
+// These are generated on-demand via ISR instead.
 export async function generateStaticParams() {
-  try {
-    const brands = await fetchVehicleHierarchy();
-    const params = [];
-    for (const locale of locales) {
-      for (const brand of brands) {
-        for (const model of brand.models) {
-          params.push({ locale, brand: brand.slug, model: model.slug });
-        }
-      }
-    }
-    return params;
-  } catch {
-    return [];
-  }
+  return [];
 }
 
 export async function generateMetadata({ params }: ModelPageProps): Promise<Metadata> {
