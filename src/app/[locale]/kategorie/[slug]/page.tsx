@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { getLocalizedProducts, getLocalizedCategories, getLocalizedCategoryBySlug } from "@/lib/woocommerce-i18n";
+import { fetchVehicleHierarchy } from "@/lib/vehicle-data";
 import ProductCard from "@/components/product/ProductCard";
+import VehicleFilter from "@/components/product/VehicleFilter";
 import { JsonLd, breadcrumbSchema, generateHreflangAlternates } from "@/lib/seo";
 import { Link } from "@/i18n/navigation";
 import { locales, type Locale } from "@/i18n/config";
 import type { WCProduct, WCCategory } from "@/types/woocommerce";
+import type { VehicleBrand } from "@/lib/vehicle-data";
 
 interface CategoryPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -51,10 +54,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   let products: WCProduct[] = [];
   let allCategories: WCCategory[] = [];
+  let vehicleBrands: VehicleBrand[] = [];
   try {
-    [products, allCategories] = await Promise.all([
+    [products, allCategories, vehicleBrands] = await Promise.all([
       getLocalizedProducts(locale as Locale, { category: category.id, per_page: 50 }),
       getLocalizedCategories(locale as Locale, { parent: 0 }),
+      fetchVehicleHierarchy(),
     ]);
   } catch { /* */ }
 
@@ -84,18 +89,30 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           <p className="mt-2 text-sm text-gray-400">{category.count} Produkte</p>
         </div>
 
-        {/* Products */}
-        {products.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+        {/* Filter + Products */}
+        <div className="flex flex-col lg:flex-row gap-8 mb-12">
+          {/* Sidebar Filter */}
+          {vehicleBrands.length > 0 && (
+            <aside className="w-full lg:w-72 flex-shrink-0">
+              <VehicleFilter brands={vehicleBrands} variant="sidebar" />
+            </aside>
+          )}
+
+          {/* Product Grid */}
+          <div className="flex-1">
+            {products.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 bg-gray-50 rounded-2xl">
+                <p className="text-gray-500">Keine Produkte in dieser Kategorie.</p>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="text-center py-16 bg-gray-50 rounded-2xl mb-12">
-            <p className="text-gray-500">Keine Produkte in dieser Kategorie.</p>
-          </div>
-        )}
+        </div>
 
         {/* Other Categories */}
         <div>
