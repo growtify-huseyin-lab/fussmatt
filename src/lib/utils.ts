@@ -22,3 +22,15 @@ export function truncate(str: string, length: number): string {
   if (str.length <= length) return str;
   return str.slice(0, length) + "...";
 }
+
+/**
+ * Rewrite WordPress media URLs from fussmatt.com to wp.fussmatt.com.
+ * Since fussmatt.com now points to Vercel, WP media must be served
+ * from the wp subdomain.
+ */
+export function wpMediaUrl(url: string): string {
+  if (!url) return url;
+  return url
+    .replace("https://fussmatt.com/wp-content/", "https://wp.fussmatt.com/wp-content/")
+    .replace("http://fussmatt.com/wp-content/", "https://wp.fussmatt.com/wp-content/");
+}

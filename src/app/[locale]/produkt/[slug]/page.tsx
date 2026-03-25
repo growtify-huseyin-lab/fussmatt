@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { getLocalizedProductBySlug, getProductVariations } from "@/lib/woocommerce-i18n";
-import { formatPrice, stripHtml } from "@/lib/utils";
+import { formatPrice, stripHtml, wpMediaUrl } from "@/lib/utils";
 import AddToCartButton from "@/components/product/AddToCartButton";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductAccordion from "@/components/product/ProductAccordion";
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   return {
     title: product.name,
     description: stripHtml(product.short_description || product.description).slice(0, 160),
-    openGraph: { images: product.images[0] ? [{ url: product.images[0].src }] : [] },
+    openGraph: { images: product.images[0] ? [{ url: wpMediaUrl(product.images[0].src) }] : [] },
     alternates: { languages: generateHreflangAlternates(`/produkt/${slug}`) },
   };
 }

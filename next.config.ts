@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
         hostname: "fussmatt.com",
       },
       {
+        protocol: "https",
+        hostname: "wp.fussmatt.com",
+      },
+      {
         protocol: "http",
         hostname: "fussmatt.local",
       },

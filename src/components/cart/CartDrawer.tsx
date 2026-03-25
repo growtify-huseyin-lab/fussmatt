@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { wpMediaUrl } from "@/lib/utils";
 import { useCartStore } from "@/lib/cart-store";
 import { formatPrice } from "@/lib/utils";
 
@@ -34,7 +35,7 @@ export default function CartDrawer() {
           return (
             <div key={key} className="flex gap-4 p-4 bg-gray-50 rounded-xl">
               <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-white">
-                {image && <Image src={image.src} alt={item.product.name} fill sizes="80px" className="object-cover" />}
+                {image && <Image src={wpMediaUrl(image.src)} alt={item.product.name} fill sizes="80px" className="object-cover" />}
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-sm font-medium text-gray-900 truncate">{item.product.name}</h4>

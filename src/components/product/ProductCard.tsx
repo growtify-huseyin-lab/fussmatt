@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { WCProduct } from "@/types/woocommerce";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, wpMediaUrl } from "@/lib/utils";
 
 interface ProductCardProps {
   product: WCProduct;
@@ -21,7 +21,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="relative aspect-square bg-gray-50 overflow-hidden">
         {mainImage ? (
           <Image
-            src={mainImage.src}
+            src={wpMediaUrl(mainImage.src)}
             alt={mainImage.alt || product.name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

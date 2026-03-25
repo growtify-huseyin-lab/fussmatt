@@ -112,58 +112,101 @@ export function parseVehicleString(str: string): {
 }
 
 /**
+ * Extract the base model name from a full model string.
+ * Strips variant suffixes like 4x2, 4x4, (1.Gen), (2.Gen), (AllRad), Bj, etc.
+ * "Duster 4x2"       → "Duster"
+ * "Duster (2.Gen)"   → "Duster"
+ * "Duster 2.Gen ab 2018 aus hochwertigem" → "Duster"
+ * "Golf 8 (CD)"      → "Golf"
+ * "3er (G20)"        → "3er"
+ * "C-Klasse (W206)"  → "C-Klasse"
+ */
+function extractBaseModel(model: string): string {
+  // Remove everything in parentheses
+  let base = model.replace(/\s*\([^)]*\)/g, "").trim();
+  // Remove variant qualifiers: 4x2, 4x4, 4*2, 2.Gen, 1.Gen, Bj, aus hochwertigem...
+  base = base
+    .replace(/\s+(4x[24]|4\*[24]|AllRad|Bj|ab\s+\d{4}|aus\s+.*)$/i, "")
+    .replace(/\s+\d+\.?\s*Gen$/i, "")
+    .trim();
+  // Remove trailing numeric model codes (keep alphanumeric model names like "3er", "A3")
+  // but strip standalone numbers like "8" from "Golf 8"
+  base = base.replace(/\s+\d+$/, "").trim();
+  return base || model;
+}
+
+/**
+ * Normalize brand name to title case for consistent grouping.
+ * "DACIA" → "Dacia", "dacia" → "Dacia", "Dacia" → "Dacia"
+ * "BMW" stays "BMW" (all-caps brands <=3 chars)
+ */
+function normalizeBrand(brand: string): string {
+  if (brand.length <= 3 && brand === brand.toUpperCase()) return brand;
+  return brand.charAt(0).toUpperCase() + brand.slice(1).toLowerCase();
+}
+
+/**
  * Build brand→model hierarchy from product attributes.
- * Call this with the "Fahrzeug" attribute values from all products.
+ * Normalizes brand/model casing and deduplicates variants.
  */
 export function buildVehicleHierarchy(vehicleStrings: string[]): VehicleBrand[] {
-  const brandMap = new Map<string, Map<string, VehicleModel>>();
+  // Phase 1: Parse and group by normalized brand → base model
+  const brandMap = new Map<string, {
+    displayName: string;
+    models: Map<string, { displayName: string; fullNames: string[] }>;
+  }>();
 
   for (const str of vehicleStrings) {
     const parsed = parseVehicleString(str);
     if (!parsed) continue;
 
-    if (!brandMap.has(parsed.brand)) {
-      brandMap.set(parsed.brand, new Map());
+    const brandKey = parsed.brand.toLowerCase();
+    const baseModel = extractBaseModel(parsed.model);
+    const modelKey = baseModel.toLowerCase();
+
+    if (!brandMap.has(brandKey)) {
+      brandMap.set(brandKey, {
+        displayName: normalizeBrand(parsed.brand),
+        models: new Map(),
+      });
     }
 
-    const models = brandMap.get(parsed.brand)!;
-    const modelKey = `${parsed.model} ${parsed.years}`;
-
-    if (!models.has(modelKey)) {
-      models.set(modelKey, {
-        name: parsed.model,
-        slug: slugify(`${parsed.brand}-${parsed.model}-${parsed.years}`) || `${slugify(parsed.brand)}-${Date.now()}`,
-        years: parsed.years,
-        fullName: str,
+    const brand = brandMap.get(brandKey)!;
+    if (!brand.models.has(modelKey)) {
+      brand.models.set(modelKey, {
+        displayName: baseModel.charAt(0).toUpperCase() + baseModel.slice(1),
+        fullNames: [],
       });
+    }
+    // Store all variant fullNames for search
+    const modelEntry = brand.models.get(modelKey)!;
+    if (!modelEntry.fullNames.includes(str)) {
+      modelEntry.fullNames.push(str);
     }
   }
 
-  // Sort brands alphabetically, ensure unique slugs
+  // Phase 2: Build sorted output
   const brands: VehicleBrand[] = [];
   const sortedBrands = [...brandMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-  const usedBrandSlugs = new Set<string>();
 
-  for (const [brandName, models] of sortedBrands) {
-    let brandSlug = slugify(brandName);
-    if (usedBrandSlugs.has(brandSlug)) {
-      brandSlug = `${brandSlug}-${usedBrandSlugs.size}`;
-    }
-    usedBrandSlugs.add(brandSlug);
+  for (const [, brandData] of sortedBrands) {
+    const models: VehicleModel[] = [];
+    const sortedModels = [...brandData.models.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 
-    // Deduplicate model slugs
-    const usedModelSlugs = new Set<string>();
-    const uniqueModels: VehicleModel[] = [];
-    for (const m of [...models.values()].sort((a, b) => a.name.localeCompare(b.name))) {
-      let mSlug = m.slug;
-      if (usedModelSlugs.has(mSlug)) {
-        mSlug = `${mSlug}-${usedModelSlugs.size}`;
-      }
-      usedModelSlugs.add(mSlug);
-      uniqueModels.push({ ...m, slug: mSlug });
+    for (const [, modelData] of sortedModels) {
+      models.push({
+        name: modelData.displayName,
+        slug: slugify(`${brandData.displayName}-${modelData.displayName}`),
+        years: "",
+        fullName: `${brandData.displayName} ${modelData.displayName}`,
+      });
     }
 
-    brands.push({ name: brandName, slug: brandSlug, models: uniqueModels });
+    brands.push({
+      name: brandData.displayName,
+      slug: slugify(brandData.displayName),
+      models,
+    });
   }
 
   return brands;

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import type { WCImage } from "@/types/woocommerce";
+import { wpMediaUrl } from "@/lib/utils";
 
 interface ProductGalleryProps {
   images: WCImage[];
@@ -55,7 +56,7 @@ export default function ProductGallery({ images, productName, onSale }: ProductG
               }`}
             >
               <Image
-                src={image.src}
+                src={wpMediaUrl(image.src)}
                 alt={image.alt || `${productName} ${index + 1}`}
                 fill
                 sizes="80px"
