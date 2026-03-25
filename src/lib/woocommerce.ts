@@ -6,8 +6,11 @@ const WC_SECRET = process.env.WC_CONSUMER_SECRET || "";
 const WP_USER = process.env.WP_APPLICATION_USER || "";
 const WP_APP_PASS = process.env.WP_APPLICATION_PASSWORD || "";
 
-// Auth header for WP Application Password (works better on local)
-const AUTH_HEADER = `Basic ${Buffer.from(`${WP_USER}:${WP_APP_PASS}`).toString("base64")}`;
+// Use Application Password auth for local, consumer key/secret for production
+const useAppPassword = !!WP_USER && !!WP_APP_PASS;
+const AUTH_HEADER = useAppPassword
+  ? `Basic ${Buffer.from(`${WP_USER}:${WP_APP_PASS}`).toString("base64")}`
+  : "";
 
 async function wcFetch<T>(
   endpoint: string,
@@ -16,18 +19,28 @@ async function wcFetch<T>(
 ): Promise<T> {
   const url = new URL(`${WORDPRESS_URL}/wp-json/wc/v3${endpoint}`);
 
+  // Add consumer key/secret for production (query param auth)
+  if (!useAppPassword && WC_KEY && WC_SECRET) {
+    url.searchParams.set("consumer_key", WC_KEY);
+    url.searchParams.set("consumer_secret", WC_SECRET);
+  }
+
   // Add query params
   Object.entries(params).forEach(([key, value]) => {
     url.searchParams.set(key, String(value));
   });
 
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...options.headers as Record<string, string>,
+  };
+  if (useAppPassword) {
+    headers["Authorization"] = AUTH_HEADER;
+  }
+
   const res = await fetch(url.toString(), {
     ...options,
-    headers: {
-      Authorization: AUTH_HEADER,
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
+    headers,
     next: { revalidate: 60 }, // ISR: revalidate every 60s
   });
 

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCartStore } from "@/lib/cart-store";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
+import Image from "next/image";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -45,9 +46,14 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 lg:h-20 gap-4">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <span className="text-2xl lg:text-3xl font-black tracking-tight text-gray-900">
-              FUSS<span className="text-amber-600">MATT</span>
-            </span>
+            <Image
+              src="/logo.png"
+              alt="FussMatt"
+              width={180}
+              height={45}
+              className="h-8 lg:h-10 w-auto"
+              priority
+            />
           </Link>
 
           {/* Search Bar — desktop */}
