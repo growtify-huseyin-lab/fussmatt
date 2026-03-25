@@ -136,7 +136,7 @@ export default function Header() {
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setFussmattenOpen(!fussmattenOpen)}
-                className={`flex items-center gap-1 px-4 h-12 transition-colors ${fussmattenOpen ? "text-amber-600" : "text-gray-700 hover:text-amber-600"}`}
+                className={`flex items-center gap-1 px-4 h-12 uppercase transition-colors ${fussmattenOpen ? "text-amber-600" : "text-gray-700 hover:text-amber-600"}`}
               >
                 Fussmatten
                 <svg className={`w-3.5 h-3.5 transition-transform ${fussmattenOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
