@@ -53,6 +53,32 @@ async function wcFetch<T>(
   return res.json();
 }
 
+/** Fetch with pagination headers (X-WP-Total, X-WP-TotalPages) */
+async function wcFetchWithHeaders<T>(
+  endpoint: string,
+  params: Record<string, string | number> = {},
+): Promise<{ data: T; total: number; totalPages: number }> {
+  const url = new URL(`${WORDPRESS_URL}/wp-json/wc/v3${endpoint}`);
+  if (!useAppPassword && WC_KEY && WC_SECRET) {
+    url.searchParams.set("consumer_key", WC_KEY);
+    url.searchParams.set("consumer_secret", WC_SECRET);
+  }
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.set(key, String(value));
+  });
+
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (useAppPassword) headers["Authorization"] = AUTH_HEADER;
+
+  const res = await fetch(url.toString(), { headers, next: { revalidate: 60 } });
+  if (!res.ok) throw new Error(`WooCommerce API error: ${res.status}`);
+
+  const data = await res.json() as T;
+  const total = parseInt(res.headers.get("X-WP-Total") || "0", 10);
+  const totalPages = parseInt(res.headers.get("X-WP-TotalPages") || "1", 10);
+  return { data, total, totalPages };
+}
+
 // ─── Products ───────────────────────────────────────────
 export async function getProducts(params: Record<string, string | number> = {}): Promise<WCProduct[]> {
   return wcFetch<WCProduct[]>("/products", {
@@ -60,6 +86,17 @@ export async function getProducts(params: Record<string, string | number> = {}):
     status: "publish",
     ...params,
   });
+}
+
+export async function getProductsWithTotal(
+  params: Record<string, string | number> = {}
+): Promise<{ products: WCProduct[]; total: number; totalPages: number }> {
+  const { data, total, totalPages } = await wcFetchWithHeaders<WCProduct[]>("/products", {
+    per_page: 20,
+    status: "publish",
+    ...params,
+  });
+  return { products: data, total, totalPages };
 }
 
 export async function getProductBySlug(slug: string): Promise<WCProduct | null> {

@@ -13,6 +13,7 @@ import type { Locale } from "@/i18n/config";
 import type { WCProduct, WCCategory } from "@/types/woocommerce";
 import {
   getProducts,
+  getProductsWithTotal,
   getProductBySlug,
   getProductById,
   getProductVariations,
@@ -24,12 +25,25 @@ import { translateProduct, translateProducts } from "./translations";
 
 // ─── Localized Products ─────────────────────────────────
 
+/** Filter out products that have no images */
+function withImages(products: WCProduct[]): WCProduct[] {
+  return products.filter((p) => p.images && p.images.length > 0 && p.images[0].src);
+}
+
 export async function getLocalizedProducts(
   locale: Locale,
   params: Record<string, string | number> = {}
 ): Promise<WCProduct[]> {
   const products = await getProducts(params);
-  return translateProducts(products, locale);
+  return withImages(translateProducts(products, locale));
+}
+
+export async function getLocalizedProductsWithTotal(
+  locale: Locale,
+  params: Record<string, string | number> = {}
+): Promise<{ products: WCProduct[]; total: number; totalPages: number }> {
+  const { products, total, totalPages } = await getProductsWithTotal(params);
+  return { products: withImages(translateProducts(products, locale)), total, totalPages };
 }
 
 export async function getLocalizedProductBySlug(
@@ -55,7 +69,7 @@ export async function searchLocalizedProducts(
 ): Promise<WCProduct[]> {
   // Always search in German (source), then translate results
   const products = await searchProducts(query);
-  return translateProducts(products, locale);
+  return withImages(translateProducts(products, locale));
 }
 
 // ─── Categories (pass-through for now) ──────────────────

@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
-import { getLocalizedProducts, getLocalizedCategories, getLocalizedCategoryBySlug } from "@/lib/woocommerce-i18n";
-import { fetchVehicleHierarchy } from "@/lib/vehicle-data";
+import { getLocalizedProductsWithTotal, getLocalizedCategories, getLocalizedCategoryBySlug } from "@/lib/woocommerce-i18n";
 import ProductCard from "@/components/product/ProductCard";
-import VehicleFilter from "@/components/product/VehicleFilter";
+import Pagination from "@/components/ui/Pagination";
 import { JsonLd, breadcrumbSchema, generateHreflangAlternates } from "@/lib/seo";
 import { Link } from "@/i18n/navigation";
 import { locales, type Locale } from "@/i18n/config";
 import type { WCProduct, WCCategory } from "@/types/woocommerce";
-import type { VehicleBrand } from "@/lib/vehicle-data";
 
 interface CategoryPageProps {
   params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 // SEO descriptions per category
@@ -45,8 +44,10 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   };
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { locale, slug } = await params;
+  const sp = await searchParams;
+  const page = typeof sp.seite === "string" ? parseInt(sp.seite) : 1;
   setRequestLocale(locale);
 
   let category: WCCategory | null = null;
@@ -57,16 +58,16 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   let products: WCProduct[] = [];
   let allCategories: WCCategory[] = [];
-  let vehicleBrands: VehicleBrand[] = [];
+  let totalPages = 1;
   try {
-    [products, allCategories] = await Promise.all([
-      getLocalizedProducts(locale as Locale, { category: category.id, per_page: 50 }),
+    const [result, cats] = await Promise.all([
+      getLocalizedProductsWithTotal(locale as Locale, { category: category.id, per_page: 20, page }),
       getLocalizedCategories(locale as Locale, { parent: 0 }),
     ]);
+    products = result.products;
+    totalPages = result.totalPages;
+    allCategories = cats;
   } catch { /* */ }
-  try {
-    vehicleBrands = await fetchVehicleHierarchy();
-  } catch { /* vehicle data timeout — filter won't show */ }
 
   const seo = CATEGORY_SEO[slug];
 
@@ -94,29 +95,26 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           <p className="mt-2 text-sm text-gray-400">{category.count} Produkte</p>
         </div>
 
-        {/* Filter + Products */}
-        <div className="flex flex-col lg:flex-row gap-8 mb-12">
-          {/* Sidebar Filter */}
-          {vehicleBrands.length > 0 && (
-            <aside className="w-full lg:w-72 flex-shrink-0">
-              <VehicleFilter brands={vehicleBrands} variant="sidebar" />
-            </aside>
-          )}
-
-          {/* Product Grid */}
-          <div className="flex-1">
-            {products.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        {/* Product Grid */}
+        <div className="mb-12">
+          {products.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
-            ) : (
-              <div className="text-center py-16 bg-gray-50 rounded-2xl">
-                <p className="text-gray-500">Keine Produkte in dieser Kategorie.</p>
-              </div>
-            )}
-          </div>
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                baseUrl={`/kategorie/${slug}`}
+              />
+            </>
+          ) : (
+            <div className="text-center py-16 bg-gray-50 rounded-2xl">
+              <p className="text-gray-500">Keine Produkte in dieser Kategorie.</p>
+            </div>
+          )}
         </div>
 
         {/* Other Categories */}

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { useTranslations } from "next-intl";
-import { getLocalizedProducts, getLocalizedCategories, getLocalizedCategoryBySlug } from "@/lib/woocommerce-i18n";
+import { getLocalizedProductsWithTotal, getLocalizedCategories, getLocalizedCategoryBySlug } from "@/lib/woocommerce-i18n";
 import ProductCard from "@/components/product/ProductCard";
+import Pagination from "@/components/ui/Pagination";
 import type { Locale } from "@/i18n/config";
 import type { WCProduct, WCCategory } from "@/types/woocommerce";
 
@@ -36,6 +37,8 @@ export default async function ProduktePage({
 
   let products: WCProduct[] = [];
   let categories: WCCategory[] = [];
+  let totalPages = 1;
+  let total = 0;
 
   try {
     const productParams: Record<string, string | number> = { per_page: 20, page, orderby: "date" };
@@ -47,18 +50,21 @@ export default async function ProduktePage({
 
     const allCategories = await getLocalizedCategories(locale as Locale, { per_page: 100 });
     categories = allCategories.filter((cat) => ALLOWED_CATEGORY_SLUGS.includes(cat.slug));
-    products = await getLocalizedProducts(locale as Locale, productParams);
+    const result = await getLocalizedProductsWithTotal(locale as Locale, productParams);
+    products = result.products;
+    totalPages = result.totalPages;
+    total = result.total;
   } catch {
     // API error
   }
 
   return (
-    <ProdukteContent products={products} categories={categories} kategorie={kategorie} search={search} page={page} />
+    <ProdukteContent products={products} categories={categories} kategorie={kategorie} search={search} page={page} totalPages={totalPages} total={total} />
   );
 }
 
-function ProdukteContent({ products, categories, kategorie, search, page }: {
-  products: WCProduct[]; categories: WCCategory[]; kategorie?: string; search?: string; page: number;
+function ProdukteContent({ products, categories, kategorie, search, page, totalPages, total }: {
+  products: WCProduct[]; categories: WCCategory[]; kategorie?: string; search?: string; page: number; totalPages: number; total: number;
 }) {
   const t = useTranslations("products");
 
@@ -68,7 +74,7 @@ function ProdukteContent({ products, categories, kategorie, search, page }: {
         <h1 className="text-3xl font-bold text-gray-900">
           {kategorie ? `${t("title")}: ${kategorie}` : search ? `${t("title")}: "${search}"` : t("title")}
         </h1>
-        <p className="mt-2 text-sm text-gray-500">{t("found", { count: products.length })}</p>
+        <p className="mt-2 text-sm text-gray-500">{t("found", { count: total || products.length })}</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
@@ -112,14 +118,15 @@ function ProdukteContent({ products, categories, kategorie, search, page }: {
               <a href="?" className="mt-4 inline-block text-sm font-medium text-amber-600 hover:text-amber-700">{t("showAllProducts")}</a>
             </div>
           )}
-          {products.length === 20 && (
-            <div className="mt-8 flex justify-center">
-              <a href={`?seite=${page + 1}${kategorie ? `&kategorie=${kategorie}` : ""}`}
-                className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-sm font-medium text-gray-700 rounded-xl transition-colors">
-                {t("loadMore")}
-              </a>
-            </div>
-          )}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            baseUrl="/produkte"
+            queryParams={{
+              ...(kategorie ? { kategorie } : {}),
+              ...(search ? { suche: search } : {}),
+            }}
+          />
         </div>
       </div>
     </div>
