@@ -78,7 +78,7 @@ export default function VehicleFilter({
               <option value="">{t("selectModel")}</option>
               {models.map((m) => (
                 <option key={m.slug} value={m.slug}>
-                  {m.name} {m.years && `(${m.years})`}
+                  {currentBrand?.name} {m.name}
                 </option>
               ))}
             </select>
@@ -133,7 +133,7 @@ export default function VehicleFilter({
             <option value="">{t("selectModel")}</option>
             {models.map((m) => (
               <option key={m.slug} value={m.slug}>
-                {m.name} {m.years && `(${m.years})`}
+                {currentBrand?.name} {m.name}
               </option>
             ))}
           </select>

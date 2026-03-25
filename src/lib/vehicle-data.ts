@@ -24,34 +24,91 @@ export interface VehicleModel {
 }
 
 /**
+ * Known car brands — used to correctly split "Brand Model Years" strings.
+ * Multi-word brands (Alfa Romeo, Land Rover) MUST come before single-word
+ * variants so the longest match wins.
+ */
+const KNOWN_BRANDS: string[] = [
+  "Alfa Romeo", "Aston Martin", "Land Rover", "Mercedes Benz", "Mercedes-Benz",
+  "Rolls Royce", "Rolls-Royce", "Great Wall",
+  "Aiways", "Alfa", "Alpine", "Audi", "BMW", "BYD", "Bentley", "Cadillac",
+  "Chevrolet", "Chrysler", "Citroen", "Citro&#235;n", "Cupra", "DS",
+  "Dacia", "Daewoo", "Daihatsu", "Dodge", "FAW", "Ferrari", "Fiat", "Ford",
+  "Genesis", "Honda", "Hummer", "Hyundai", "Infiniti", "Isuzu", "Iveco",
+  "Jaguar", "Jeep", "Kia", "Lada", "Lamborghini", "Lancia", "Lexus",
+  "Lincoln", "Lotus", "MAN", "MG", "MINI", "Maserati", "Mazda", "McLaren",
+  "Mercedes", "Mitsubishi", "Nissan", "Opel", "Peugeot", "Polestar",
+  "Porsche", "Renault", "Rover", "Saab", "Seat", "SEAT", "Skoda",
+  "Smart", "SsangYong", "Subaru", "Suzuki", "Tesla", "Toyota",
+  "Volkswagen", "Volvo", "VW", "DAF", "Scania", "MAN", "Iveco",
+];
+
+/**
  * Parse a vehicle attribute string into brand + model + years.
  * Examples:
- *   "BMW 3er (G20) 2019-2025" → { brand: "BMW", model: "3er (G20)", years: "2019-2025" }
- *   "VW Golf 8 (CD) 2020-2025" → { brand: "VW", model: "Golf 8 (CD)", years: "2020-2025" }
+ *   "BMW 3er (G20) 2019-2025" &#8594; { brand: "BMW", model: "3er (G20)", years: "2019-2025" }
+ *   "VW Golf 8 (CD) 2020-2025" &#8594; { brand: "VW", model: "Golf 8 (CD)", years: "2020-2025" }
+ *   "Alfa Romeo Giulietta Baujahr ab 2013" &#8594; { brand: "Alfa Romeo", model: "Giulietta", years: "Baujahr ab 2013" }
  */
 export function parseVehicleString(str: string): {
   brand: string;
   model: string;
   years: string;
 } | null {
-  // Match pattern: "Brand ModelName (Code) YYYY-YYYY" or "Brand ModelName YYYY-YYYY"
-  const match = str.match(/^([A-Za-z\-]+(?:\s[A-Za-z\-]+)?)\s+(.+?)\s+(\d{4}[-–]\d{4}|\w+\s\d{4})$/);
-  if (match) {
-    return { brand: match[1].trim(), model: match[2].trim(), years: match[3].trim() };
-  }
+  const trimmed = str.trim();
+  if (!trimmed) return null;
 
-  // Try simpler pattern: "Brand Rest"
-  const simpleMatch = str.match(/^([A-Za-z\-]+)\s+(.+)$/);
-  if (simpleMatch) {
-    const yearsMatch = simpleMatch[2].match(/(\d{4}[-–]\d{4}|\w+\s\d{4})$/);
-    if (yearsMatch) {
-      const model = simpleMatch[2].replace(yearsMatch[0], "").trim();
-      return { brand: simpleMatch[1], model, years: yearsMatch[0] };
+  // 1. Try known brands (longest match first)
+  let matchedBrand = "";
+  const lower = trimmed.toLowerCase();
+  for (const b of KNOWN_BRANDS) {
+    const bLower = b.toLowerCase();
+    if (lower.startsWith(bLower + " ") || lower === bLower) {
+      if (b.length > matchedBrand.length) {
+        matchedBrand = b;
+      }
     }
-    return { brand: simpleMatch[1], model: simpleMatch[2], years: "" };
   }
 
-  return null;
+  if (!matchedBrand) {
+    // Fallback: first word is brand
+    const spaceIdx = trimmed.indexOf(" ");
+    if (spaceIdx === -1) return null;
+    matchedBrand = trimmed.substring(0, spaceIdx);
+  }
+
+  // Use original casing from input for brand
+  const brandFromInput = trimmed.substring(0, matchedBrand.length);
+  const rest = trimmed.substring(matchedBrand.length).trim();
+  if (!rest) return null;
+
+  // 2. Extract years from the end
+  const yearsPatterns = [
+    /\b(Baujahr\s+ab\s+\d{4})$/i,
+    /\b(ab\s+Baujahr\s+\d{4})$/i,
+    /\b(ab\s+\d{4})$/i,
+    /\b(\d{4}\s*[-\u2013]\s*\d{4})$/,
+    /\b(seit\s+\d{4})$/i,
+  ];
+
+  let years = "";
+  let modelPart = rest;
+
+  for (const pattern of yearsPatterns) {
+    const ym = rest.match(pattern);
+    if (ym) {
+      years = ym[1].trim();
+      modelPart = rest.substring(0, rest.length - ym[0].length).trim();
+      break;
+    }
+  }
+
+  // Clean up model name (remove trailing parentheses if empty)
+  modelPart = modelPart.replace(/\(\s*\)\s*$/, "").trim();
+
+  if (!modelPart) return null;
+
+  return { brand: brandFromInput, model: modelPart, years };
 }
 
 /**
