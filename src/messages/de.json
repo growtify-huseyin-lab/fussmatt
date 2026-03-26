@@ -82,6 +82,20 @@
     "sale": "SALE",
     "categories": "Kategorien"
   },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "description": "Die angeforderte Seite existiert nicht oder wurde verschoben.",
+    "goHome": "Zur Startseite",
+    "allProducts": "Alle Produkte"
+  },
+  "kategorie": {
+    "notFoundTitle": "Kategorie nicht gefunden",
+    "searchLabel": "Suche",
+    "noProducts": "Keine Produkte in dieser Kategorie.",
+    "moreCategories": "Weitere Kategorien",
+    "home": "Home",
+    "discount": "% Rabatt"
+  },
   "product": {
     "home": "Startseite",
     "mats": "Fussmatten",

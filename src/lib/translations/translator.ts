@@ -123,6 +123,14 @@ function autoTranslateText(text: string, locale: string): string {
   return result;
 }
 
+// ─── Attribute label translations ─────────────────────
+const ATTR_LABELS: Record<string, Record<string, string>> = {
+  en: { "Marke": "Brand", "Modell": "Model", "Fahrzeug": "Vehicle", "Material": "Material", "Farbe": "Color", "Gewicht": "Weight", "Lieferumfang": "Scope of delivery", "Passend f\u00fcr": "Compatible with" },
+  fr: { "Marke": "Marque", "Modell": "Mod\u00e8le", "Fahrzeug": "V\u00e9hicule", "Material": "Mat\u00e9riau", "Farbe": "Couleur", "Gewicht": "Poids", "Lieferumfang": "Contenu de la livraison", "Passend f\u00fcr": "Compatible avec" },
+  it: { "Marke": "Marca", "Modell": "Modello", "Fahrzeug": "Veicolo", "Material": "Materiale", "Farbe": "Colore", "Gewicht": "Peso", "Lieferumfang": "Contenuto della consegna", "Passend f\u00fcr": "Compatibile con" },
+  nl: { "Marke": "Merk", "Modell": "Model", "Fahrzeug": "Voertuig", "Material": "Materiaal", "Farbe": "Kleur", "Gewicht": "Gewicht", "Lieferumfang": "Leveringsomvang", "Passend f\u00fcr": "Passend voor" },
+};
+
 /** Auto-translate product using term dictionary */
 function autoTranslateProduct(product: WCProduct, locale: Locale): WCProduct {
   const loc = locale as string;
@@ -136,6 +144,10 @@ function autoTranslateProduct(product: WCProduct, locale: Locale): WCProduct {
     categories: product.categories.map((cat) => ({
       ...cat,
       name: autoTranslateText(cat.name, loc),
+    })),
+    attributes: product.attributes.map((attr) => ({
+      ...attr,
+      name: ATTR_LABELS[loc]?.[attr.name] || attr.name,
     })),
   };
 }

@@ -82,6 +82,20 @@
     "sale": "PROMO",
     "categories": "Cat\u00e9gories"
   },
+  "notFound": {
+    "title": "Page non trouv\u00e9e",
+    "description": "La page demand\u00e9e n'existe pas ou a \u00e9t\u00e9 d\u00e9plac\u00e9e.",
+    "goHome": "Retour \u00e0 l'accueil",
+    "allProducts": "Tous les produits"
+  },
+  "kategorie": {
+    "notFoundTitle": "Cat\u00e9gorie non trouv\u00e9e",
+    "searchLabel": "Recherche",
+    "noProducts": "Aucun produit dans cette cat\u00e9gorie.",
+    "moreCategories": "Plus de cat\u00e9gories",
+    "home": "Accueil",
+    "discount": "% de r\u00e9duction"
+  },
   "product": {
     "home": "Accueil",
     "mats": "Tapis de sol",

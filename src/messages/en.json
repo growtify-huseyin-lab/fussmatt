@@ -82,6 +82,20 @@
     "sale": "SALE",
     "categories": "Categories"
   },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The requested page does not exist or has been moved.",
+    "goHome": "Go to homepage",
+    "allProducts": "All products"
+  },
+  "kategorie": {
+    "notFoundTitle": "Category not found",
+    "searchLabel": "Search",
+    "noProducts": "No products in this category.",
+    "moreCategories": "More categories",
+    "home": "Home",
+    "discount": "% off"
+  },
   "product": {
     "home": "Home",
     "mats": "Floor Mats",

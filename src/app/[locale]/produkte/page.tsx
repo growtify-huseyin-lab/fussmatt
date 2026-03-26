@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { getLocalizedProductsWithTotal, getLocalizedCategories, getLocalizedCategoryBySlug } from "@/lib/woocommerce-i18n";
 import ProductCard from "@/components/product/ProductCard";
 import Pagination from "@/components/ui/Pagination";
 import type { Locale } from "@/i18n/config";
+import { locales } from "@/i18n/config";
 import type { WCProduct, WCCategory } from "@/types/woocommerce";
+import { generateHreflangAlternates } from "@/lib/seo";
 
 const ALLOWED_CATEGORY_SLUGS = [
   "5d-fussmatten",
@@ -17,9 +19,19 @@ const ALLOWED_CATEGORY_SLUGS = [
   "fuss-und-kofferraummatten-set",
 ];
 
-export const metadata: Metadata = {
-  title: "Alle Fussmatten",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "products" });
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://fussmatt.com";
+  return {
+    title: t("title"),
+    description: t("found", { count: "1300+" }),
+    alternates: {
+      canonical: `${siteUrl}/${locale}/produkte`,
+      languages: generateHreflangAlternates("/produkte"),
+    },
+  };
+}
 
 export default async function ProduktePage({
   params,

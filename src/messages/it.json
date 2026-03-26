@@ -82,6 +82,20 @@
     "sale": "OFFERTA",
     "categories": "Categorie"
   },
+  "notFound": {
+    "title": "Pagina non trovata",
+    "description": "La pagina richiesta non esiste o \u00e8 stata spostata.",
+    "goHome": "Vai alla home",
+    "allProducts": "Tutti i prodotti"
+  },
+  "kategorie": {
+    "notFoundTitle": "Categoria non trovata",
+    "searchLabel": "Ricerca",
+    "noProducts": "Nessun prodotto in questa categoria.",
+    "moreCategories": "Altre categorie",
+    "home": "Home",
+    "discount": "% di sconto"
+  },
   "product": {
     "home": "Home",
     "mats": "Tappetini",

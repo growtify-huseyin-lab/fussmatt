@@ -82,6 +82,20 @@
     "sale": "SALE",
     "categories": "Categorie\u00ebn"
   },
+  "notFound": {
+    "title": "Pagina niet gevonden",
+    "description": "De gevraagde pagina bestaat niet of is verplaatst.",
+    "goHome": "Naar startpagina",
+    "allProducts": "Alle producten"
+  },
+  "kategorie": {
+    "notFoundTitle": "Categorie niet gevonden",
+    "searchLabel": "Zoeken",
+    "noProducts": "Geen producten in deze categorie.",
+    "moreCategories": "Meer categorie\u00ebn",
+    "home": "Home",
+    "discount": "% korting"
+  },
   "product": {
     "home": "Home",
     "mats": "Vloermatten",
