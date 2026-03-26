@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { getLocalizedProductsWithTotal, getLocalizedCategories, getLocalizedCategoryBySlug } from "@/lib/woocommerce-i18n";
+import { fetchVehicleHierarchy } from "@/lib/vehicle-data";
 import ProductCard from "@/components/product/ProductCard";
+import VehicleFilter from "@/components/product/VehicleFilter";
 import Pagination from "@/components/ui/Pagination";
 import { JsonLd, breadcrumbSchema, generateHreflangAlternates } from "@/lib/seo";
 import { Link } from "@/i18n/navigation";
@@ -48,6 +50,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   const { locale, slug } = await params;
   const sp = await searchParams;
   const page = typeof sp.seite === "string" ? parseInt(sp.seite) : 1;
+  const search = typeof sp.suche === "string" ? sp.suche : undefined;
   setRequestLocale(locale);
 
   let category: WCCategory | null = null;
@@ -59,14 +62,21 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   let products: WCProduct[] = [];
   let allCategories: WCCategory[] = [];
   let totalPages = 1;
+  let vehicleBrands: import("@/lib/vehicle-data").VehicleBrand[] = [];
   try {
+    const productParams: Record<string, string | number> = { category: category.id, per_page: 20, page };
+    if (search) productParams.search = search;
+
     const [result, cats] = await Promise.all([
-      getLocalizedProductsWithTotal(locale as Locale, { category: category.id, per_page: 20, page }),
+      getLocalizedProductsWithTotal(locale as Locale, productParams),
       getLocalizedCategories(locale as Locale, { parent: 0 }),
     ]);
     products = result.products;
     totalPages = result.totalPages;
     allCategories = cats;
+  } catch { /* */ }
+  try {
+    vehicleBrands = await fetchVehicleHierarchy();
   } catch { /* */ }
 
   const seo = CATEGORY_SEO[slug];
@@ -95,11 +105,26 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
           <p className="mt-2 text-sm text-gray-400">{category.count} Produkte</p>
         </div>
 
-        {/* Product Grid */}
-        <div className="mb-12">
+        {/* Filter + Products */}
+        <div className="flex flex-col lg:flex-row gap-8 mb-12">
+          {/* Sidebar */}
+          {vehicleBrands.length > 0 && (
+            <aside className="w-full lg:w-72 flex-shrink-0">
+              <VehicleFilter brands={vehicleBrands} variant="sidebar" categorySlug={slug} />
+            </aside>
+          )}
+
+          {/* Product Grid */}
+          <div className="flex-1">
+          {search && (
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-sm text-gray-500">Suche: &ldquo;{search}&rdquo;</span>
+              <a href={`/kategorie/${slug}`} className="text-xs text-amber-600 hover:underline">Filter entfernen</a>
+            </div>
+          )}
           {products.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -115,6 +140,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               <p className="text-gray-500">Keine Produkte in dieser Kategorie.</p>
             </div>
           )}
+          </div>
         </div>
 
         {/* Other Categories */}

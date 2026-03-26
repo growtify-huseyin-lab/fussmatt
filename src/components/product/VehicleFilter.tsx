@@ -10,6 +10,8 @@ interface VehicleFilterProps {
   variant?: "hero" | "sidebar";
   selectedBrand?: string;
   selectedModel?: string;
+  /** When set, search stays within this category */
+  categorySlug?: string;
 }
 
 export default function VehicleFilter({
@@ -17,6 +19,7 @@ export default function VehicleFilter({
   variant = "hero",
   selectedBrand,
   selectedModel,
+  categorySlug,
 }: VehicleFilterProps) {
   const t = useTranslations("filter");
   const router = useRouter();
@@ -38,7 +41,11 @@ export default function VehicleFilter({
     const query = selectedFullModel
       ? selectedFullModel.fullName
       : currentBrand?.name || "";
-    router.push(`/produkte?suche=${encodeURIComponent(query)}`);
+    // Stay within category context if on a category page
+    const basePath = categorySlug
+      ? `/kategorie/${categorySlug}`
+      : "/produkte";
+    router.push(`${basePath}?suche=${encodeURIComponent(query)}`);
   };
 
   // ─── Hero variant: MyFussmatten style white card ──────
