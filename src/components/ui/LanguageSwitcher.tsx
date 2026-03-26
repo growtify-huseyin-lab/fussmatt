@@ -6,6 +6,9 @@ import { useRouter, usePathname } from "@/i18n/navigation";
 import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
 
 export default function LanguageSwitcher() {
+  // v1: Single locale (DE only) — hide switcher
+  if (locales.length <= 1) return null;
+
   const locale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();

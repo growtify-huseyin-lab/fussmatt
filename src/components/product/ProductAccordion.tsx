@@ -39,26 +39,36 @@ export default function ProductAccordion({ description, attributes }: ProductAcc
     });
   }
 
-  // Zusätzliche Informationen — attribute table
-  if (attributes.length > 0) {
+  // Zusätzliche Informationen — attribute table (deduplicated)
+  const visibleAttrs = attributes.filter((a) => a.visible);
+  if (visibleAttrs.length > 0) {
+    // Merge attributes with the same name (WC sometimes duplicates them)
+    const mergedMap = new Map<string, string[]>();
+    for (const attr of visibleAttrs) {
+      const existing = mergedMap.get(attr.name) || [];
+      for (const opt of attr.options) {
+        if (!existing.includes(opt)) existing.push(opt);
+      }
+      mergedMap.set(attr.name, existing);
+    }
+    const merged = [...mergedMap.entries()];
+
     sections.push({
       id: "zusatzinfo",
       title: t("additionalInfo"),
       content: (
         <table className="w-full text-sm">
           <tbody>
-            {attributes
-              .filter((a) => a.visible)
-              .map((attr, i) => (
+            {merged.map(([name, options], i) => (
                 <tr
-                  key={attr.id || attr.name}
+                  key={name}
                   className={i % 2 === 0 ? "bg-gray-50" : "bg-white"}
                 >
                   <td className="px-4 py-3 font-medium text-gray-700 w-1/3">
-                    {attr.name}
+                    {name}
                   </td>
                   <td className="px-4 py-3 text-gray-600">
-                    {attr.options.join(", ")}
+                    {options.join(", ")}
                   </td>
                 </tr>
               ))}
