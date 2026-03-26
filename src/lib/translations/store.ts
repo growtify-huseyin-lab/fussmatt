@@ -16,6 +16,8 @@ const DATA_DIR = path.join(process.cwd(), "data");
 const STORE_PATH = path.join(DATA_DIR, "product-translations.json");
 
 // ─── Read / Write helpers ───────────────────────────────
+// Cache the parsed store in memory (24 MB JSON, parse once)
+let _cachedStore: TranslationStore | null = null;
 
 function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) {
@@ -24,11 +26,13 @@ function ensureDataDir() {
 }
 
 function readStore(): TranslationStore {
+  if (_cachedStore) return _cachedStore;
   ensureDataDir();
   if (!fs.existsSync(STORE_PATH)) return {};
   try {
     const raw = fs.readFileSync(STORE_PATH, "utf-8");
-    return JSON.parse(raw) as TranslationStore;
+    _cachedStore = JSON.parse(raw) as TranslationStore;
+    return _cachedStore;
   } catch {
     return {};
   }
