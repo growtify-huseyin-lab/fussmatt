@@ -44,7 +44,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: "" },
         { name: "Fussmatten", url: "/produkte" },
-        ...(product.categories[0] ? [{ name: product.categories[0].name, url: `/produkte?kategorie=${product.categories[0].slug}` }] : []),
+        ...(() => { const cat = product.categories.find(c => c.slug !== "unkategorisiert" && c.slug !== "uncategorized"); return cat ? [{ name: cat.name, url: `/produkte?kategorie=${cat.slug}` }] : []; })(),
         { name: product.name, url: `/produkt/${product.slug}` },
       ], locale as Locale)} />
       <ProductContent product={product} variations={variations} />
@@ -75,14 +75,7 @@ function ProductContent({ product, variations }: { product: WCProduct; variation
             <a href="/" className="hover:text-amber-600">{t("home")}</a>
             <span>/</span>
             <a href="/produkte" className="hover:text-amber-600">{t("mats")}</a>
-            {product.categories[0] && (
-              <>
-                <span>/</span>
-                <a href={`/produkte?kategorie=${product.categories[0].slug}`} className="hover:text-amber-600">
-                  {product.categories[0].name}
-                </a>
-              </>
-            )}
+            {(() => { const cat = product.categories.find(c => c.slug !== "unkategorisiert" && c.slug !== "uncategorized"); return cat ? (<><span>/</span><a href={`/produkte?kategorie=${cat.slug}`} className="hover:text-amber-600">{cat.name}</a></>) : null; })()}
           </nav>
 
           {/* Title */}

@@ -46,9 +46,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         <h3 className="text-sm font-medium text-gray-900 line-clamp-2 group-hover:text-amber-700 transition-colors">
           {product.name}
         </h3>
-        {product.categories.length > 0 && (
+        {product.categories.filter(c => c.slug !== "unkategorisiert" && c.slug !== "uncategorized").length > 0 && (
           <p className="mt-1 text-xs text-gray-500">
-            {product.categories.map((c) => c.name).join(" / ")}
+            {product.categories.filter(c => c.slug !== "unkategorisiert" && c.slug !== "uncategorized").map((c) => c.name).join(" / ")}
           </p>
         )}
         <div className="mt-3 flex items-baseline gap-2">
