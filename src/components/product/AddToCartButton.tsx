@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
 import { useCartStore } from "@/lib/cart-store";
 import type { WCProduct, WCProductVariation } from "@/types/woocommerce";
 
@@ -11,7 +10,6 @@ interface AddToCartButtonProps {
 }
 
 export default function AddToCartButton({ product, variations }: AddToCartButtonProps) {
-  const t = useTranslations("product");
   const addItem = useCartStore((s) => s.addItem);
   const [quantity, setQuantity] = useState(1);
   const [selectedAttrs, setSelectedAttrs] = useState<Record<string, string>>({});
@@ -40,7 +38,7 @@ export default function AddToCartButton({ product, variations }: AddToCartButton
             onChange={(e) => setSelectedAttrs((prev) => ({ ...prev, [attr.name]: e.target.value }))}
             className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
           >
-            <option value="">{t("selectVariant")}</option>
+            <option value="">{"Bitte wählen..."}</option>
             {attr.options.map((opt) => (<option key={opt} value={opt}>{opt}</option>))}
           </select>
         </div>
@@ -57,7 +55,7 @@ export default function AddToCartButton({ product, variations }: AddToCartButton
           disabled={!canAdd}
           className={`flex-1 h-12 rounded-xl font-medium text-sm transition-all ${added ? "bg-green-600 text-white" : canAdd ? "bg-amber-600 hover:bg-amber-700 text-white" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
         >
-          {added ? t("added") : isVariable && !selectedVariation ? t("chooseVariant") : t("addToCart")}
+          {added ? "✓ Hinzugefügt!" : isVariable && !selectedVariation ? "Variante wählen" : "In den Warenkorb"}
         </button>
       </div>
     </div>

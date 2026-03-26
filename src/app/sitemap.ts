@@ -1,5 +1,4 @@
 import type { MetadataRoute } from "next";
-import { locales } from "@/i18n/config";
 import { fetchVehicleHierarchy } from "@/lib/vehicle-data";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://fussmatt.com";
@@ -22,120 +21,98 @@ function wcFetchUrl(endpoint: string): { url: string; headers: Record<string, st
   return { url: u.toString(), headers };
 }
 
-function localeAlternates(path: string) {
-  return { languages: Object.fromEntries(locales.map((l) => [l, `${SITE_URL}/${l}${path}`])) };
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
   const now = new Date();
 
-  // ─── Static pages ─────────────────────────────────────
+  // Static pages
   const staticPages = [
     { path: "", priority: 1.0, freq: "daily" as const },
     { path: "/produkte", priority: 0.8, freq: "daily" as const },
     { path: "/ratgeber", priority: 0.7, freq: "weekly" as const },
+    { path: "/kontakt", priority: 0.5, freq: "monthly" as const },
+    { path: "/agb", priority: 0.3, freq: "monthly" as const },
+    { path: "/datenschutz", priority: 0.3, freq: "monthly" as const },
+    { path: "/impressum", priority: 0.3, freq: "monthly" as const },
+    { path: "/versand", priority: 0.4, freq: "monthly" as const },
+    { path: "/widerruf", priority: 0.3, freq: "monthly" as const },
   ];
 
-  for (const locale of locales) {
-    for (const page of staticPages) {
-      entries.push({
-        url: `${SITE_URL}/${locale}${page.path}`,
-        lastModified: now,
-        changeFrequency: page.freq,
-        priority: page.priority,
-        alternates: localeAlternates(page.path),
-      });
-    }
+  for (const page of staticPages) {
+    entries.push({
+      url: `${SITE_URL}${page.path}`,
+      lastModified: now,
+      changeFrequency: page.freq,
+      priority: page.priority,
+    });
   }
 
-  // ─── Brand pages (/marke/[brand]/) ────────────────────
+  // Brand pages
   try {
     const brands = await fetchVehicleHierarchy();
     for (const brand of brands) {
-      for (const locale of locales) {
+      entries.push({
+        url: `${SITE_URL}/marke/${brand.slug}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.8,
+      });
+      for (const model of brand.models) {
         entries.push({
-          url: `${SITE_URL}/${locale}/marke/${brand.slug}`,
+          url: `${SITE_URL}/marke/${brand.slug}/${model.slug}`,
           lastModified: now,
           changeFrequency: "weekly",
           priority: 0.8,
-          alternates: localeAlternates(`/marke/${brand.slug}`),
         });
-
-        // Model pages (/marke/[brand]/[model]/)
-        for (const model of brand.models) {
-          entries.push({
-            url: `${SITE_URL}/${locale}/marke/${brand.slug}/${model.slug}`,
-            lastModified: now,
-            changeFrequency: "weekly",
-            priority: 0.8,
-            alternates: localeAlternates(`/marke/${brand.slug}/${model.slug}`),
-          });
-        }
       }
     }
-  } catch { /* vehicle data not available */ }
+  } catch { /* */ }
 
-  // ─── Category pages (/kategorie/[slug]/) ──────────────
+  // Category pages
   try {
     const catReq = wcFetchUrl("/products/categories?per_page=100&hide_empty=1");
     if (!catReq.url) throw new Error("No WP URL");
-    const res = await fetch(catReq.url, {
-      headers: catReq.headers,
-      next: { revalidate: 3600 },
-    });
+    const res = await fetch(catReq.url, { headers: catReq.headers, next: { revalidate: 3600 } });
     if (res.ok) {
       const categories = (await res.json()) as Array<{ slug: string }>;
       for (const cat of categories) {
-        for (const locale of locales) {
-          entries.push({
-            url: `${SITE_URL}/${locale}/kategorie/${cat.slug}`,
-            lastModified: now,
-            changeFrequency: "weekly",
-            priority: 0.7,
-            alternates: localeAlternates(`/kategorie/${cat.slug}`),
-          });
-        }
+        entries.push({
+          url: `${SITE_URL}/kategorie/${cat.slug}`,
+          lastModified: now,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        });
       }
     }
   } catch { /* */ }
 
-  // ─── Product pages (/produkt/[slug]/) ─────────────────
+  // Product pages
   try {
     const prodReq = wcFetchUrl("/products?per_page=100&status=publish");
     if (!prodReq.url) throw new Error("No WP URL");
-    const res = await fetch(prodReq.url, {
-      headers: prodReq.headers,
-      next: { revalidate: 3600 },
-    });
+    const res = await fetch(prodReq.url, { headers: prodReq.headers, next: { revalidate: 3600 } });
     if (res.ok) {
       const products = (await res.json()) as Array<{ slug: string; date_modified: string }>;
       for (const product of products) {
-        for (const locale of locales) {
-          entries.push({
-            url: `${SITE_URL}/${locale}/produkt/${product.slug}`,
-            lastModified: new Date(product.date_modified),
-            changeFrequency: "daily",
-            priority: 0.9,
-            alternates: localeAlternates(`/produkt/${product.slug}`),
-          });
-        }
+        entries.push({
+          url: `${SITE_URL}/produkt/${product.slug}`,
+          lastModified: new Date(product.date_modified),
+          changeFrequency: "daily",
+          priority: 0.9,
+        });
       }
     }
   } catch { /* */ }
 
-  // ─── Ratgeber pages ───────────────────────────────────
+  // Ratgeber pages
   const guides = ["3d-vs-5d-fussmatten-unterschied", "tpe-fussmatten-material-vorteile", "auto-fussmatten-kaufberatung"];
   for (const slug of guides) {
-    for (const locale of locales) {
-      entries.push({
-        url: `${SITE_URL}/${locale}/ratgeber/${slug}`,
-        lastModified: now,
-        changeFrequency: "monthly",
-        priority: 0.6,
-        alternates: localeAlternates(`/ratgeber/${slug}`),
-      });
-    }
+    entries.push({
+      url: `${SITE_URL}/ratgeber/${slug}`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    });
   }
 
   return entries;

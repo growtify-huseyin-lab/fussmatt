@@ -1,12 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 
 export default function Footer() {
-  const t = useTranslations("footer");
-  const tNav = useTranslations("nav");
 
   return (
     <footer className="bg-gray-950 text-gray-400">
@@ -15,53 +12,53 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Image src="/logo.png" alt="FussMatt" width={160} height={48} className="h-12 w-auto brightness-0 invert" />
-            <p className="mt-4 text-sm leading-relaxed">{t("tagline")}</p>
+            <p className="mt-4 text-sm leading-relaxed">{"Premium 3D & 5D Auto-Fussmatten aus TPE-Material. Passgenau für Ihr Fahrzeug."}</p>
           </div>
 
           {/* Shop */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">{t("shopTitle")}</h3>
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">{"Shop"}</h3>
             <ul className="space-y-3">
-              <li><Link href="/produkte" className="text-sm hover:text-amber-500 transition-colors">{tNav("allProducts")}</Link></li>
-              <li><Link href="/produkte?typ=3d" className="text-sm hover:text-amber-500 transition-colors">{tNav("3d")}</Link></li>
-              <li><Link href="/produkte?typ=5d" className="text-sm hover:text-amber-500 transition-colors">{tNav("5d")}</Link></li>
+              <li><Link href="/produkte" className="text-sm hover:text-amber-500 transition-colors">{"Alle Fussmatten"}</Link></li>
+              <li><Link href="/produkte?typ=3d" className="text-sm hover:text-amber-500 transition-colors">{"3D Fussmatten"}</Link></li>
+              <li><Link href="/produkte?typ=5d" className="text-sm hover:text-amber-500 transition-colors">{"5D Fussmatten"}</Link></li>
             </ul>
           </div>
 
           {/* Info */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">{t("infoTitle")}</h3>
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">{"Information"}</h3>
             <ul className="space-y-3">
-              <li><Link href="/versand" className="text-sm hover:text-amber-500 transition-colors">{t("shippingLink")}</Link></li>
-              <li><Link href="/widerruf" className="text-sm hover:text-amber-500 transition-colors">{t("returnLink")}</Link></li>
-              <li><Link href="/kontakt" className="text-sm hover:text-amber-500 transition-colors">{t("contactLink")}</Link></li>
+              <li><Link href="/versand" className="text-sm hover:text-amber-500 transition-colors">{"Versand & Lieferung"}</Link></li>
+              <li><Link href="/widerruf" className="text-sm hover:text-amber-500 transition-colors">{"Rückgabe & Umtausch"}</Link></li>
+              <li><Link href="/kontakt" className="text-sm hover:text-amber-500 transition-colors">{"Kontakt"}</Link></li>
             </ul>
           </div>
 
           {/* Legal */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">{t("legalTitle")}</h3>
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">{"Rechtliches"}</h3>
             <ul className="space-y-3">
-              <li><Link href="/impressum" className="text-sm hover:text-amber-500 transition-colors">{t("imprint")}</Link></li>
-              <li><Link href="/datenschutz" className="text-sm hover:text-amber-500 transition-colors">{t("privacy")}</Link></li>
-              <li><Link href="/agb" className="text-sm hover:text-amber-500 transition-colors">{t("terms")}</Link></li>
-              <li><Link href="/widerruf" className="text-sm hover:text-amber-500 transition-colors">{t("withdrawal")}</Link></li>
+              <li><Link href="/impressum" className="text-sm hover:text-amber-500 transition-colors">{"Impressum"}</Link></li>
+              <li><Link href="/datenschutz" className="text-sm hover:text-amber-500 transition-colors">{"Datenschutz"}</Link></li>
+              <li><Link href="/agb" className="text-sm hover:text-amber-500 transition-colors">{"AGB"}</Link></li>
+              <li><Link href="/widerruf" className="text-sm hover:text-amber-500 transition-colors">{"Widerrufsbelehrung"}</Link></li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <p className="text-xs">{t("copyright", { year: new Date().getFullYear() })}</p>
+            <p className="text-xs">{`\u00a9 ${new Date().getFullYear()} FussMatt. Alle Rechte vorbehalten.`}</p>
             <button
               onClick={() => window.dispatchEvent(new Event("open-cookie-settings"))}
               className="text-xs text-gray-500 hover:text-amber-500 transition-colors underline"
             >
-              {t("cookieSettings")}
+              {"Cookie-Einstellungen"}
             </button>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-xs">{t("paymentMethods")}:</span>
+            <span className="text-xs">{"Zahlungsmethoden"}:</span>
             <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
               <span>Stripe</span>
               <span>&#183;</span>

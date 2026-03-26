@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
+import { useRouter } from "next/navigation";
 import type { VehicleBrand } from "@/lib/vehicle-data";
 
 interface VehicleFilterProps {
@@ -21,7 +20,6 @@ export default function VehicleFilter({
   selectedModel,
   categorySlug,
 }: VehicleFilterProps) {
-  const t = useTranslations("filter");
   const router = useRouter();
   const [brand, setBrand] = useState(selectedBrand || "");
   const [model, setModel] = useState(selectedModel || "");
@@ -53,7 +51,7 @@ export default function VehicleFilter({
     return (
       <div className="bg-white rounded-3xl shadow-2xl p-8 sm:p-10 max-w-md mx-auto lg:mx-0 text-center">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-8">
-          {t("title")}
+          {"Finden Sie Ihre Fussmatten"}
         </h2>
 
         <div className="space-y-4">
@@ -64,7 +62,7 @@ export default function VehicleFilter({
               onChange={(e) => { setBrand(e.target.value); setModel(""); }}
               className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl text-base text-gray-700 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none appearance-none cursor-pointer transition-colors"
             >
-              <option value="">{t("selectBrand")}</option>
+              <option value="">{"Marke wählen"}</option>
               {brands.map((b, i) => (
                 <option key={`${b.slug}-${i}`} value={b.slug}>{b.name}</option>
               ))}
@@ -82,7 +80,7 @@ export default function VehicleFilter({
               disabled={!brand || models.length === 0}
               className={`w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl text-base text-gray-700 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none appearance-none cursor-pointer transition-colors ${!brand ? "opacity-40 cursor-not-allowed" : ""}`}
             >
-              <option value="">{t("selectModel")}</option>
+              <option value="">{"Modell wählen"}</option>
               {models.map((m) => (
                 <option key={m.slug} value={m.slug}>
                   {currentBrand?.name} {m.name}
@@ -101,7 +99,7 @@ export default function VehicleFilter({
           disabled={!brand}
           className="mt-8 px-12 py-4 bg-amber-500 hover:bg-amber-400 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-base uppercase tracking-wider rounded-full transition-colors shadow-lg shadow-amber-500/25"
         >
-          {t("search")}
+          {"Suchen"}
         </button>
       </div>
     );
@@ -111,7 +109,7 @@ export default function VehicleFilter({
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-5">
       <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
-        {t("vehicleFilter")}
+        {"Fahrzeugfilter"}
       </h3>
       <div className="space-y-3">
         <div className="relative">
@@ -120,7 +118,7 @@ export default function VehicleFilter({
             onChange={(e) => { setBrand(e.target.value); setModel(""); }}
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none appearance-none cursor-pointer"
           >
-            <option value="">{t("selectBrand")}</option>
+            <option value="">{"Marke wählen"}</option>
             {brands.map((b) => (
               <option key={b.slug} value={b.slug}>{b.name}</option>
             ))}
@@ -137,7 +135,7 @@ export default function VehicleFilter({
             disabled={!brand || models.length === 0}
             className={`w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none appearance-none cursor-pointer ${!brand ? "opacity-50" : ""}`}
           >
-            <option value="">{t("selectModel")}</option>
+            <option value="">{"Modell wählen"}</option>
             {models.map((m) => (
               <option key={m.slug} value={m.slug}>
                 {currentBrand?.name} {m.name}
@@ -154,7 +152,7 @@ export default function VehicleFilter({
           disabled={!brand}
           className="w-full py-3 bg-amber-600 hover:bg-amber-500 disabled:bg-gray-200 disabled:cursor-not-allowed text-white font-medium text-sm rounded-xl transition-colors"
         >
-          {t("search")}
+          {"Suchen"}
         </button>
       </div>
     </div>

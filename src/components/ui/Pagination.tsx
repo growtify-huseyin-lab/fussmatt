@@ -1,7 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -11,7 +9,6 @@ interface PaginationProps {
 }
 
 export default function Pagination({ currentPage, totalPages, baseUrl, queryParams = {} }: PaginationProps) {
-  const t = useTranslations("products");
 
   if (totalPages <= 1) return null;
 
@@ -45,11 +42,11 @@ export default function Pagination({ currentPage, totalPages, baseUrl, queryPara
       {currentPage > 1 ? (
         <a href={buildUrl(currentPage - 1)}
           className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-          &larr; {t("prev") || "Zur\u00fcck"}
+          &larr; Zur&uuml;ck
         </a>
       ) : (
         <span className="px-3 py-2 text-sm font-medium text-gray-300 bg-gray-50 border border-gray-100 rounded-lg cursor-not-allowed">
-          &larr; {t("prev") || "Zur\u00fcck"}
+          &larr; Zur&uuml;ck
         </span>
       )}
 
@@ -73,11 +70,11 @@ export default function Pagination({ currentPage, totalPages, baseUrl, queryPara
       {currentPage < totalPages ? (
         <a href={buildUrl(currentPage + 1)}
           className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-          {t("next") || "Weiter"} &rarr;
+          Weiter &rarr;
         </a>
       ) : (
         <span className="px-3 py-2 text-sm font-medium text-gray-300 bg-gray-50 border border-gray-100 rounded-lg cursor-not-allowed">
-          {t("next") || "Weiter"} &rarr;
+          Weiter &rarr;
         </span>
       )}
     </nav>

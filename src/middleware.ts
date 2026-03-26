@@ -1,8 +1,4 @@
-import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
-import { routing } from "./i18n/routing";
-
-const intlMiddleware = createMiddleware(routing);
 
 const securityHeaders: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
@@ -25,30 +21,16 @@ const securityHeaders: Record<string, string> = {
   ].join("; "),
 };
 
-function applySecurityHeaders(response: NextResponse) {
+export default function middleware(request: NextRequest) {
+  const response = NextResponse.next();
   for (const [key, value] of Object.entries(securityHeaders)) {
     response.headers.set(key, value);
   }
   return response;
 }
 
-export default function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // API routes: apply security headers without intl processing
-  if (pathname.startsWith("/api/")) {
-    const response = NextResponse.next();
-    return applySecurityHeaders(response);
-  }
-
-  // Page routes: intl middleware + security headers
-  const response = intlMiddleware(request);
-  return applySecurityHeaders(response);
-}
-
 export const config = {
   matcher: [
-    // Match all pathnames except Next.js internals and static files
     "/((?!_next|.*\\..*).*)",
   ],
 };

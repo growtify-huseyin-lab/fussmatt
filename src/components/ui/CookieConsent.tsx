@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { updateConsentMode } from "@/lib/gtm";
 
 const COOKIE_KEY = "fussmatt-consent";
@@ -33,7 +32,6 @@ export default function CookieConsent() {
   const [showSettings, setShowSettings] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const [marketing, setMarketing] = useState(false);
-  const t = useTranslations("cookie");
 
   useEffect(() => {
     const consent = getConsent();
@@ -87,10 +85,10 @@ export default function CookieConsent() {
       <div className="max-w-4xl mx-auto bg-gray-950 text-white rounded-2xl shadow-2xl p-6">
         <div className="mb-4">
           <p className="text-sm leading-relaxed text-gray-300">
-            {t("message")}
+            {"Wir verwenden Cookies, um Ihnen das beste Einkaufserlebnis zu bieten. Sie können Ihre Einstellungen jederzeit anpassen."}
           </p>
           <Link href="/datenschutz" className="text-xs text-amber-500 hover:text-amber-400 mt-1 inline-block">
-            {t("learnMore")}
+            {"Datenschutzerklärung"}
           </Link>
         </div>
 
@@ -98,15 +96,15 @@ export default function CookieConsent() {
           <div className="mb-4 space-y-3 border-t border-gray-800 pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-white">{t("essential")}</p>
-                <p className="text-xs text-gray-400">{t("essentialDesc")}</p>
+                <p className="text-sm font-medium text-white">{"Notwendig"}</p>
+                <p className="text-xs text-gray-400">{"Erforderlich für die Grundfunktionen des Shops."}</p>
               </div>
-              <div className="bg-amber-600 text-xs font-medium px-3 py-1 rounded-full">{t("alwaysActive")}</div>
+              <div className="bg-amber-600 text-xs font-medium px-3 py-1 rounded-full">{"Immer aktiv"}</div>
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-white">{t("analytics")}</p>
-                <p className="text-xs text-gray-400">{t("analyticsDesc")}</p>
+                <p className="text-sm font-medium text-white">{"Statistiken"}</p>
+                <p className="text-xs text-gray-400">{"Helfen uns, die Nutzung der Website zu verstehen."}</p>
               </div>
               <button
                 onClick={() => setAnalytics(!analytics)}
@@ -117,8 +115,8 @@ export default function CookieConsent() {
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-white">{t("marketing")}</p>
-                <p className="text-xs text-gray-400">{t("marketingDesc")}</p>
+                <p className="text-sm font-medium text-white">{"Marketing"}</p>
+                <p className="text-xs text-gray-400">{"Werden für personalisierte Werbung verwendet."}</p>
               </div>
               <button
                 onClick={() => setMarketing(!marketing)}
@@ -137,19 +135,19 @@ export default function CookieConsent() {
                 onClick={() => setShowSettings(true)}
                 className="px-5 py-2.5 text-sm font-medium text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 rounded-xl transition-colors"
               >
-                {t("settings")}
+                {"Einstellungen"}
               </button>
               <button
                 onClick={handleRejectAll}
                 className="px-5 py-2.5 text-sm font-medium text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 rounded-xl transition-colors"
               >
-                {t("reject")}
+                {"Nur notwendige"}
               </button>
               <button
                 onClick={handleAcceptAll}
                 className="px-5 py-2.5 text-sm font-medium text-white bg-amber-600 hover:bg-amber-500 rounded-xl transition-colors"
               >
-                {t("accept")}
+                {"Alle akzeptieren"}
               </button>
             </>
           ) : (
@@ -158,13 +156,13 @@ export default function CookieConsent() {
                 onClick={() => setShowSettings(false)}
                 className="px-5 py-2.5 text-sm font-medium text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 rounded-xl transition-colors"
               >
-                {t("back")}
+                {"Zurück"}
               </button>
               <button
                 onClick={handleSaveSettings}
                 className="px-5 py-2.5 text-sm font-medium text-white bg-amber-600 hover:bg-amber-500 rounded-xl transition-colors"
               >
-                {t("saveSettings")}
+                {"Auswahl speichern"}
               </button>
             </>
           )}

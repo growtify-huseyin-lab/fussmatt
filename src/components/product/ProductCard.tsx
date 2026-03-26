@@ -1,6 +1,5 @@
 import Image from "next/image";
-import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import type { WCProduct } from "@/types/woocommerce";
 import { formatPrice, wpMediaUrl } from "@/lib/utils";
 
@@ -9,7 +8,6 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const t = useTranslations("products");
   const mainImage = product.images[0];
 
   return (
@@ -36,7 +34,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
         {product.on_sale && (
           <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg z-10">
-            {t("sale")}
+            {"SALE"}
           </div>
         )}
       </div>
@@ -61,12 +59,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.stock_status === "instock" ? (
             <span className="inline-flex items-center gap-1 text-xs text-green-600">
               <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-              {t("inStock")}
+              {"Auf Lager"}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 text-xs text-red-500">
               <span className="w-1.5 h-1.5 bg-red-500 rounded-full" />
-              {t("outOfStock")}
+              {"Nicht verfügbar"}
             </span>
           )}
         </div>

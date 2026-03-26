@@ -1,15 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { wpMediaUrl } from "@/lib/utils";
 import { useCartStore } from "@/lib/cart-store";
 import { formatPrice } from "@/lib/utils";
 
 export default function CartDrawer() {
   const { items, removeItem, updateQuantity, totalPrice } = useCartStore();
-  const t = useTranslations("cart");
 
   if (items.length === 0) {
     return (
@@ -17,9 +15,9 @@ export default function CartDrawer() {
         <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
         </svg>
-        <p className="text-gray-500 text-sm">{t("empty")}</p>
+        <p className="text-gray-500 text-sm">{"Ihr Warenkorb ist leer"}</p>
         <Link href="/produkte" className="mt-4 inline-block text-sm font-medium text-amber-600 hover:text-amber-700">
-          {t("shopNow")} &rarr;
+          {"Jetzt einkaufen"} &rarr;
         </Link>
       </div>
     );
@@ -51,7 +49,7 @@ export default function CartDrawer() {
                   <span className="text-sm font-bold text-gray-900">{formatPrice(parseFloat(price) * item.quantity)}</span>
                 </div>
               </div>
-              <button onClick={() => removeItem(item.product.id, item.variation?.id)} className="flex-shrink-0 text-gray-400 hover:text-red-500 transition-colors" aria-label={t("remove")}>
+              <button onClick={() => removeItem(item.product.id, item.variation?.id)} className="flex-shrink-0 text-gray-400 hover:text-red-500 transition-colors" aria-label={"Entfernen"}>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
@@ -61,15 +59,15 @@ export default function CartDrawer() {
 
       <div className="border-t border-gray-200 pt-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">{t("subtotal")}</span>
+          <span className="text-sm text-gray-600">{"Zwischensumme"}</span>
           <span className="text-lg font-bold text-gray-900">{formatPrice(totalPrice())}</span>
         </div>
-        <p className="text-xs text-gray-500 mt-1">{t("vatNote")}</p>
+        <p className="text-xs text-gray-500 mt-1">{"Inkl. MwSt. Versandkosten werden an der Kasse berechnet."}</p>
       </div>
 
       <div className="space-y-3">
-        <Link href="/kasse" className="block w-full bg-amber-600 hover:bg-amber-700 text-white text-center py-3 rounded-xl font-medium transition-colors">{t("checkout")}</Link>
-        <Link href="/produkte" className="block w-full text-center py-3 text-sm text-gray-600 hover:text-amber-600 transition-colors">{t("continueShopping")}</Link>
+        <Link href="/kasse" className="block w-full bg-amber-600 hover:bg-amber-700 text-white text-center py-3 rounded-xl font-medium transition-colors">{"Zur Kasse"}</Link>
+        <Link href="/produkte" className="block w-full text-center py-3 text-sm text-gray-600 hover:text-amber-600 transition-colors">{"Weiter einkaufen"}</Link>
       </div>
     </div>
   );

@@ -3,8 +3,6 @@
  */
 
 import type { WCProduct } from "@/types/woocommerce";
-import type { Locale } from "@/i18n/config";
-import { locales } from "@/i18n/config";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://fussmatt.com";
 const SITE_NAME = "FussMatt";
@@ -21,7 +19,7 @@ export function organizationSchema() {
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer service",
-      availableLanguage: ["German", "English", "French", "Italian", "Dutch"],
+      availableLanguage: ["German"],
     },
     sameAs: [],
   };
@@ -39,7 +37,7 @@ export function webSiteSchema() {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${SITE_URL}/de/produkte?suche={search_term_string}`,
+        urlTemplate: `${SITE_URL}/produkte?suche={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },
@@ -48,8 +46,8 @@ export function webSiteSchema() {
 
 // ─── Product Schema ─────────────────────────────────────
 
-export function productSchema(product: WCProduct, locale: Locale) {
-  const url = `${SITE_URL}/${locale}/produkt/${product.slug}`;
+export function productSchema(product: WCProduct) {
+  const url = `${SITE_URL}/produkt/${product.slug}`;
   const image = product.images[0]?.src || `${SITE_URL}/placeholder.jpg`;
 
   const schema: Record<string, unknown> = {
@@ -120,10 +118,7 @@ export function productSchema(product: WCProduct, locale: Locale) {
 
 // ─── BreadcrumbList Schema ──────────────────────────────
 
-export function breadcrumbSchema(
-  items: { name: string; url: string }[],
-  locale: Locale
-) {
+export function breadcrumbSchema(items: { name: string; url: string }[]) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -131,20 +126,9 @@ export function breadcrumbSchema(
       "@type": "ListItem",
       position: i + 1,
       name: item.name,
-      item: `${SITE_URL}/${locale}${item.url}`,
+      item: `${SITE_URL}${item.url}`,
     })),
   };
-}
-
-// ─── Hreflang alternates ────────────────────────────────
-
-export function generateHreflangAlternates(pathname: string) {
-  const alternates: Record<string, string> = {};
-  for (const loc of locales) {
-    alternates[loc] = `${SITE_URL}/${loc}${pathname}`;
-  }
-  alternates["x-default"] = `${SITE_URL}/de${pathname}`;
-  return alternates;
 }
 
 // ─── Helper: render JSON-LD script tag ──────────────────
