@@ -2,6 +2,7 @@
 // GTM container loads only when NEXT_PUBLIC_GTM_ID is set
 
 export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "";
+export const GA_ID = "G-66WQV421DW";
 
 /**
  * Consent Mode v2 default state — all denied until user interacts with banner.
@@ -20,7 +21,16 @@ export function getConsentModeDefaultScript(): string {
     });
     gtag('set', 'ads_data_redaction', true);
     gtag('set', 'url_passthrough', true);
+    gtag('js', new Date());
+    gtag('config', '${GA_ID}');
   `;
+}
+
+/**
+ * GA4 gtag.js loader script
+ */
+export function getGA4Script(): string {
+  return `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
 }
 
 /**
