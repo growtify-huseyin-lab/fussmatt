@@ -92,25 +92,54 @@ function HomeContent({
       </section>
 
       {/* Categories */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="mt-8">
-          <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Kategorien</h3>
-          <div className="flex flex-wrap gap-2">
+      <section className="bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Unsere Kategorien</h2>
+            <p className="mt-2 text-gray-500">Finden Sie die passende Fussmatte f&uuml;r Ihr Fahrzeug</p>
+          </div>
+
+          {/* Top row: 3 large cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
             {[
-              { label: "5D Premium Fussmatten", href: "/kategorie/5d-fussmatten" },
-              { label: "3D Fussmatten", href: "/kategorie/3d-fussmatten" },
-              { label: "LKW-Truck Fussmatten", href: "/kategorie/passend-fuer-lkw-truck-fussmatten" },
-              { label: "Kleinbus & Pickup Fussmatten", href: "/kategorie/passend-fuer-kleinbus-pickup-fussmatten" },
-              { label: "Universal Fussmatten", href: "/kategorie/universal-fussmatten" },
-              { label: "Kofferraummatte", href: "/kategorie/kofferraummatte" },
-              { label: "Fuss- & Kofferraummatten Set", href: "/kategorie/fuss-und-kofferraummatten-set" },
+              { label: "5D Premium", sub: "Auto-Fussmatten", href: "/kategorie/5d-fussmatten", icon: "\u2B50", gradient: "from-amber-500 to-amber-600" },
+              { label: "3D Fussmatten", sub: "Aus Gummi", href: "/kategorie/3d-fussmatten", icon: "\uD83D\uDFE9", gradient: "from-gray-700 to-gray-900" },
+              { label: "Fuss- & Kofferraum", sub: "Matten Set", href: "/kategorie/fuss-und-kofferraummatten-set", icon: "\uD83D\uDCE6", gradient: "from-slate-700 to-slate-900" },
             ].map((cat) => (
               <Link
                 key={cat.href}
                 href={cat.href}
-                className="px-4 py-2 bg-gray-100 hover:bg-amber-50 hover:text-amber-700 text-sm font-medium text-gray-700 rounded-full transition-colors"
+                className="group relative overflow-hidden rounded-2xl h-44 flex flex-col justify-end p-6 text-white transition-transform hover:scale-[1.02]"
               >
-                {cat.label}
+                <div className={`absolute inset-0 bg-gradient-to-br ${cat.gradient}`} />
+                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+                <div className="absolute top-4 right-4 text-4xl opacity-30 group-hover:opacity-50 transition-opacity">{cat.icon}</div>
+                <div className="relative">
+                  <h3 className="text-xl font-bold leading-tight">{cat.label}</h3>
+                  <p className="text-sm text-white/70 mt-0.5">{cat.sub}</p>
+                </div>
+                <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Bottom row: 4 smaller cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              { label: "Kofferraummatte", href: "/kategorie/kofferraummatte", icon: "\uD83D\uDE97" },
+              { label: "LKW & Truck", href: "/kategorie/passend-fuer-lkw-truck-fussmatten", icon: "\uD83D\uDE9A" },
+              { label: "Kleinbus & Pickup", href: "/kategorie/passend-fuer-kleinbus-pickup-fussmatten", icon: "\uD83D\uDE90" },
+              { label: "Universal", href: "/kategorie/universal-fussmatten", icon: "\u2699\uFE0F" },
+            ].map((cat) => (
+              <Link
+                key={cat.href}
+                href={cat.href}
+                className="group bg-white rounded-2xl border border-gray-200 hover:border-amber-300 hover:shadow-lg hover:shadow-amber-100/50 p-5 flex flex-col items-center text-center gap-3 transition-all"
+              >
+                <span className="text-3xl group-hover:scale-110 transition-transform">{cat.icon}</span>
+                <span className="text-sm font-semibold text-gray-800 group-hover:text-amber-700 transition-colors">{cat.label}</span>
               </Link>
             ))}
           </div>

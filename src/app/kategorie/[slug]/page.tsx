@@ -140,20 +140,33 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         </div>
 
         {/* Other Categories */}
-        <div>
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Weitere Kategorien</h2>
-          <div className="flex flex-wrap gap-3">
+        <div className="mt-12 pt-10 border-t border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Weitere Kategorien</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {allCategories
               .filter((c) => c.slug !== slug)
-              .map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/kategorie/${c.slug}`}
-                  className="px-5 py-2.5 bg-gray-100 hover:bg-amber-50 hover:text-amber-700 text-sm font-medium text-gray-700 rounded-full transition-colors"
-                >
-                  {c.name} <span className="text-gray-400">({c.count})</span>
-                </Link>
-              ))}
+              .map((c) => {
+                const icons: Record<string, string> = {
+                  "5d-fussmatten": "\u2B50",
+                  "3d-fussmatten": "\uD83D\uDFE9",
+                  "kofferraummatte": "\uD83D\uDE97",
+                  "fuss-und-kofferraummatten-set": "\uD83D\uDCE6",
+                  "passend-fuer-lkw-truck-fussmatten": "\uD83D\uDE9A",
+                  "passend-fuer-kleinbus-pickup-fussmatten": "\uD83D\uDE90",
+                  "universal-fussmatten": "\u2699\uFE0F",
+                };
+                return (
+                  <Link
+                    key={c.id}
+                    href={`/kategorie/${c.slug}`}
+                    className="group bg-white rounded-xl border border-gray-200 hover:border-amber-300 hover:shadow-md p-4 flex flex-col items-center text-center gap-2 transition-all"
+                  >
+                    <span className="text-2xl group-hover:scale-110 transition-transform">{icons[c.slug] || "\uD83D\uDCCC"}</span>
+                    <span className="text-xs font-semibold text-gray-700 group-hover:text-amber-700 transition-colors leading-tight">{c.name}</span>
+                    <span className="text-[10px] text-gray-400">{c.count} Produkte</span>
+                  </Link>
+                );
+              })}
           </div>
         </div>
       </div>
