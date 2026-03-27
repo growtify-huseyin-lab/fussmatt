@@ -7,6 +7,9 @@ import VehicleFilter from "@/components/product/VehicleFilter";
 import type { VehicleBrand } from "@/lib/vehicle-data";
 import type { WCProduct } from "@/types/woocommerce";
 
+// ISR: rebuild at most every 5 minutes
+export const revalidate = 300;
+
 export const metadata: Metadata = {
   title: "FussMatt | Premium 3D & 5D Auto-Fussmatten",
   description: "Massgeschneiderte Premium Auto-Fussmatten aus TPE-Material. 3D & 5D Modelle f\u00fcr alle Fahrzeugmarken. Kostenloser Versand in CH, DE, AT, FR, IT, NL.",
