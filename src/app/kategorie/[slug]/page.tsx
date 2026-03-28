@@ -1,3 +1,5 @@
+export const revalidate = 300; // ISR: rebuild every 5 min
+
 import type { Metadata } from "next";
 import { getProductsWithTotal, getCategories, getCategoryBySlug } from "@/lib/woocommerce";
 import Link from "next/link";

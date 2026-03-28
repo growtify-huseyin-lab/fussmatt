@@ -257,7 +257,7 @@ export async function fetchVehicleHierarchy(): Promise<VehicleBrand[]> {
 
       const res = await fetch(url.toString(), {
         headers: authHeaders,
-        next: { revalidate: 3600 },
+        next: { revalidate: 86400 }, // 24h cache — vehicle data rarely changes
       });
 
       if (!res.ok) break;

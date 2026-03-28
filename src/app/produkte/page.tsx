@@ -1,3 +1,5 @@
+export const revalidate = 300;
+
 import type { Metadata } from "next";
 import { getProductsWithTotal, getCategories, getCategoryBySlug } from "@/lib/woocommerce";
 import ProductCard from "@/components/product/ProductCard";

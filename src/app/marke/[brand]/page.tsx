@@ -1,3 +1,5 @@
+export const revalidate = 300;
+
 import type { Metadata } from "next";
 import { getProducts } from "@/lib/woocommerce";
 import Link from "next/link";
