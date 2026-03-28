@@ -1,4 +1,5 @@
-export const revalidate = 300;
+export const revalidate = 3600;
+export const dynamicParams = true; // Allow non-pre-generated slugs
 
 import type { Metadata } from "next";
 import { getProductBySlug, getProductVariations } from "@/lib/woocommerce";

@@ -16,6 +16,19 @@ interface CategoryPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
+// Pre-generate the 7 known category pages at build time
+export async function generateStaticParams() {
+  return [
+    { slug: "5d-fussmatten" },
+    { slug: "3d-fussmatten" },
+    { slug: "passend-fuer-lkw-truck-fussmatten" },
+    { slug: "passend-fuer-kleinbus-pickup-fussmatten" },
+    { slug: "universal-fussmatten" },
+    { slug: "kofferraummatte" },
+    { slug: "fuss-und-kofferraummatten-set" },
+  ];
+}
+
 // SEO descriptions per category
 const CATEGORY_SEO: Record<string, { titleSuffix: string; description: string }> = {
   "5d-fussmatten": {
