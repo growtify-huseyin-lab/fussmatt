@@ -41,7 +41,7 @@ async function wcFetch<T>(
   const res = await fetch(url.toString(), {
     ...options,
     headers,
-    next: { revalidate: 300 }, // ISR: revalidate every 60s
+    next: { revalidate: 3600 }, // ISR: revalidate every 60s
   });
 
   if (!res.ok) {
@@ -70,7 +70,7 @@ async function wcFetchWithHeaders<T>(
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (useAppPassword) headers["Authorization"] = AUTH_HEADER;
 
-  const res = await fetch(url.toString(), { headers, next: { revalidate: 300 } });
+  const res = await fetch(url.toString(), { headers, next: { revalidate: 3600 } });
   if (!res.ok) throw new Error(`WooCommerce API error: ${res.status}`);
 
   const data = await res.json() as T;

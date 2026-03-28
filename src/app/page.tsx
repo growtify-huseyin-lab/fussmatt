@@ -8,7 +8,7 @@ import type { VehicleBrand } from "@/lib/vehicle-data";
 import type { WCProduct } from "@/types/woocommerce";
 
 // ISR: rebuild at most every 5 minutes
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "FussMatt | Premium 3D & 5D Auto-Fussmatten",
